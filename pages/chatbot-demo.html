@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Demo - PFE Platform</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/buttons.css">
+    <link rel="stylesheet" href="../css/ai-chatbot.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- Typed.js for typewriter effect -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-title {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-description {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            line-height: 1.6;
+        }
+        
+        .demo-cta {
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .demo-cta-text {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .theme-toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="theme-toggle-container">
+        <button class="chatbot-control-button" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+    
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">Assistant IA Avancé pour la Plateforme PFE</h1>
+            <p class="demo-subtitle">Découvrez notre chatbot intelligent avec animations sophistiquées, reconnaissance vocale et réponses contextuelles pour une expérience utilisateur optimale.</p>
+        </div>
+        
+        <div class="demo-features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">IA Contextuelle</h3>
+                <p class="feature-description">Notre chatbot comprend le contexte de la conversation et fournit des réponses pertinentes et personnalisées à chaque interaction.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3 class="feature-title">Animations Élégantes</h3>
+                <p class="feature-description">Des animations fluides et des transitions élégantes rendent l'expérience utilisateur agréable et moderne.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3 class="feature-title">Reconnaissance Vocale</h3>
+                <p class="feature-description">Interagissez avec le chatbot en utilisant votre voix pour une expérience mains libres et accessible.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <h3 class="feature-title">Synthèse Vocale</h3>
+                <p class="feature-description">Le chatbot peut lire ses réponses à haute voix, améliorant l'accessibilité pour tous les utilisateurs.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="feature-title">Suggestions Intelligentes</h3>
+                <p class="feature-description">Des suggestions de questions pertinentes guident l'utilisateur et facilitent la navigation dans les fonctionnalités de la plateforme.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <h3 class="feature-title">Mode Sombre</h3>
+                <p class="feature-description">Basculez facilement entre les thèmes clair et sombre pour une expérience visuelle adaptée à vos préférences.</p>
+            </div>
+        </div>
+        
+        <div class="demo-cta">
+            <p class="demo-cta-text">Cliquez sur l'icône de chat en bas à droite pour essayer l'assistant IA dès maintenant!</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Retour à la Plateforme PFE
+            </button>
+        </div>
+    </div>
+    
+    <!-- Chatbot Toggle -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot"></i>
+                Assistant PFE
+            </div>
+            <div class="chatbot-controls">
+                <button class="chatbot-control-button" id="themeToggleChat">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="chatbot-close" id="chatbotClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <!-- Messages will be added here dynamically -->
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <button class="chatbot-voice" id="chatbotVoice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="chatbot-send" id="chatbotSend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/ai-chatbot.js"></script>
+</body>
+</html>

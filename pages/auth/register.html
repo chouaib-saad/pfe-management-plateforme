@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un compte - PFE Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/sparkle-button.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+
+            transition: all 0.5s ease;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+        
+        .auth-image {
+            flex: 1;
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+        
+        @media (min-width: 992px) {
+            .auth-image {
+                display: flex;
+            }
+        }
+        
+        .auth-image-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+        
+        .auth-image-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-image-text {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .auth-image-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .auth-image-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-image-feature-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .auth-image-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .auth-image-shape {
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .auth-image-shape-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            top: -100px;
+            right: -100px;
+        }
+        
+        .auth-image-shape-2 {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: -50px;
+            left: -50px;
+        }
+        
+        .auth-image-shape-3 {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: 100px;
+            right: 50px;
+        }
+        
+        .auth-form {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .auth-form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .auth-form-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .auth-form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1f4b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-form-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .auth-form-content {
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #1a1f4b;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .form-select {
+            padding: 0.8rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+        
+        .form-select:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: #a5b4fc;
+            border-color: #a5b4fc;
+        }
+        
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            cursor: pointer;
+        }
+        
+        .auth-form-footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .auth-form-footer-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-form-footer-link {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-form-footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-form-divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+        }
+        
+        .auth-form-divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e9ecef;
+        }
+        
+        .auth-form-divider-text {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .social-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-button {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-button:hover {
+            background: #f8f9fa;
+        }
+        
+        .social-button-icon {
+            font-size: 1.2rem;
+        }
+        
+        .social-button-icon.google {
+            color: #ea4335;
+        }
+        
+        .social-button-icon.facebook {
+            color: #1877f2;
+        }
+        
+        .social-button-icon.apple {
+            color: #000000;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+        }
+        
+        .password-field {
+            position: relative;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+        
+        .password-strength-bar {
+            height: 5px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-strength-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .password-strength-fill.weak {
+            width: 25%;
+            background: #dc3545;
+        }
+        
+        .password-strength-fill.medium {
+            width: 50%;
+            background: #ffc107;
+        }
+        
+        .password-strength-fill.strong {
+            width: 75%;
+            background: #0dcaf0;
+        }
+        
+        .password-strength-fill.very-strong {
+            width: 100%;
+            background: #198754;
+        }
+        
+        .form-floating {
+            position: relative;
+        }
+        
+        .form-floating .form-control {
+            height: calc(3.5rem + 2px);
+            padding: 1rem 0.75rem;
+        }
+        
+        .form-floating label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 1rem 0.75rem;
+            pointer-events: none;
+            border: 1px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+            color: #6c757d;
+        }
+        
+        .form-floating .form-control:focus,
+        .form-floating .form-control:not(:placeholder-shown) {
+            padding-top: 1.625rem;
+            padding-bottom: 0.625rem;
+        }
+        
+        .form-floating .form-control:focus ~ label,
+        .form-floating .form-control:not(:placeholder-shown) ~ label {
+            opacity: .65;
+            transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .alert-success {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border: 1px solid rgba(25, 135, 84, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-form {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-image">
+            <div class="auth-image-content">
+                <h1 class="auth-image-title">Bienvenue sur la plateforme PFE</h1>
+                <p class="auth-image-text">Créez votre compte pour accéder à toutes les fonctionnalités de gestion des projets de fin d'études.</p>
+                
+                <ul class="auth-image-features">
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Gestion complète des projets PFE</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Planification des soutenances</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Attribution automatique des jurys</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Statistiques et rapports détaillés</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="auth-image-shapes">
+                <div class="auth-image-shape auth-image-shape-1"></div>
+                <div class="auth-image-shape auth-image-shape-2"></div>
+                <div class="auth-image-shape auth-image-shape-3"></div>
+            </div>
+        </div>
+        
+        <div class="auth-form">
+            <div class="auth-form-header">
+                <div class="auth-form-logo">P</div>
+                <h2 class="auth-form-title">Créer un compte</h2>
+                <p class="auth-form-subtitle">Remplissez le formulaire pour vous inscrire</p>
+            </div>
+            
+            <div class="auth-form-content">
+                <!-- Alert for errors -->
+                <div class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span class="alert-message">Message d'erreur</span>
+                </div>
+                
+                <form id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="firstName" placeholder="Entrez votre prénom" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="lastName" placeholder="Entrez votre nom" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Adresse email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Entrez votre adresse email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="role" class="form-label">Rôle</label>
+                        <select class="form-select" id="role" required>
+                            <option value="" selected disabled>Sélectionnez votre rôle</option>
+                            <option value="student">Étudiant</option>
+                            <option value="teacher">Enseignant</option>
+                            <option value="department">Chef de département</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="department" class="form-label">Département</label>
+                        <select class="form-select" id="department" required>
+                            <option value="" selected disabled>Sélectionnez votre département</option>
+                            <option value="info">Informatique</option>
+                            <option value="telecom">Télécommunications</option>
+                            <option value="meca">Mécanique</option>
+                            <option value="elec">Électrique</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group password-field">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" placeholder="Créez un mot de passe" required>
+                        <span class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                        
+                        <div class="password-strength">
+                            <div class="password-strength-bar">
+                                <div class="password-strength-fill"></div>
+                            </div>
+                            <div class="password-strength-text">Force du mot de passe: <span>Faible</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group password-field">
+                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmez votre mot de passe" required>
+                        <span class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                J'accepte les <a href="#" class="auth-form-footer-link">conditions d'utilisation</a> et la <a href="#" class="auth-form-footer-link">politique de confidentialité</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="sparkle-button">
+                        <span class="spark"></span>
+                        <span class="backdrop"></span>
+                        <span class="text">Créer mon compte</span>
+                    </button>
+                </form>
+                
+                <div class="auth-form-divider">
+                    <div class="auth-form-divider-line"></div>
+                    <div class="auth-form-divider-text">ou inscrivez-vous avec</div>
+                    <div class="auth-form-divider-line"></div>
+                </div>
+                
+                <div class="social-buttons">
+                    <button class="social-button">
+                        <i class="fab fa-google social-button-icon google"></i>
+                    </button>
+                    <button class="social-button">
+                        <i class="fab fa-facebook-f social-button-icon facebook"></i>
+                    </button>
+                    <button class="social-button">
+                        <i class="fab fa-apple social-button-icon apple"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="auth-form-footer">
+                <p class="auth-form-footer-text">
+                    Vous avez déjà un compte ? <a href="login.html" class="auth-form-footer-link">Connectez-vous</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-toggle">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-title">Assistant PFE</div>
+                <div class="chatbot-controls">
+                    <div class="chatbot-minimize"><i class="fas fa-minus"></i></div>
+                    <div class="chatbot-close"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Bonjour ! Je suis l'assistant IA de la plateforme PFE. Comment puis-je vous aider avec la création de votre compte ?</p>
+                    </div>
+                    <div class="message-time">Maintenant</div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions">
+                <div class="suggestion-chip">Comment choisir mon rôle ?</div>
+                <div class="suggestion-chip">Mot de passe sécurisé ?</div>
+                <div class="suggestion-chip">Problème d'inscription</div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <div class="action-button voice-input"><i class="fas fa-microphone"></i></div>
+                    <div class="action-button send-message"><i class="fas fa-paper-plane"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password Toggle
+            const passwordToggles = document.querySelectorAll('.password-toggle');
+            
+            passwordToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const passwordField = this.previousElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    if (passwordField.type === 'password') {
+                        passwordField.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordField.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            });
+            
+            // Password Strength
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.querySelector('.password-strength-fill');
+            const strengthText = document.querySelector('.password-strength-text span');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Length check
+                if (password.length >= 8) {
+                    strength += 1;
+                }
+                
+                // Uppercase check
+                if (/[A-Z]/.test(password)) {
+                    strength += 1;
+                }
+                
+                // Lowercase check
+                if (/[a-z]/.test(password)) {
+                    strength += 1;
+                }
+                
+                // Number check
+                if (/[0-9]/.test(password)) {
+                    strength += 1;
+                }
+                
+                // Special character check
+                if (/[^A-Za-z0-9]/.test(password)) {
+                    strength += 1;
+                }
+                
+                // Update UI based on strength
+                strengthBar.className = 'password-strength-fill';
+                
+                if (password.length === 0) {
+                    strengthBar.style.width = '0%';
+                    strengthText.textContent = 'Faible';
+                } else if (strength < 2) {
+                    strengthBar.classList.add('weak');
+                    strengthText.textContent = 'Faible';
+                } else if (strength < 3) {
+                    strengthBar.classList.add('medium');
+                    strengthText.textContent = 'Moyen';
+                } else if (strength < 5) {
+                    strengthBar.classList.add('strong');
+                    strengthText.textContent = 'Fort';
+                } else {
+                    strengthBar.classList.add('very-strong');
+                    strengthText.textContent = 'Très fort';
+                }
+            });
+            
+            // Form Validation
+            const registerForm = document.getElementById('registerForm');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const alertBox = document.querySelector('.alert');
+            const alertMessage = document.querySelector('.alert-message');
+            
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset alert
+                alertBox.style.display = 'none';
+                
+                // Check if passwords match
+                if (passwordInput.value !== confirmPassword.value) {
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Les mots de passe ne correspondent pas.';
+                    return;
+                }
+                
+                // Check password strength
+                if (passwordInput.value.length < 8) {
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Le mot de passe doit contenir au moins 8 caractères.';
+                    return;
+                }
+                
+                // Simulate form submission
+                alertBox.className = 'alert alert-success';
+                alertBox.style.display = 'block';
+                alertMessage.textContent = 'Compte créé avec succès ! Redirection vers la page de connexion...';
+                
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            });
+            
+            // Role-based department visibility
+            const roleSelect = document.getElementById('role');
+            const departmentGroup = document.getElementById('department').closest('.form-group');
+            
+            roleSelect.addEventListener('change', function() {
+                if (this.value === 'student' || this.value === 'teacher' || this.value === 'department') {
+                    departmentGroup.style.display = 'block';
+                } else {
+                    departmentGroup.style.display = 'none';
+                }
+            });
+
+
+
+            const loginLink = document.querySelector('a[href="login.html"]');
+        if (loginLink) {
+            loginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Start the fade-out animation
+                document.body.style.opacity = '0';
+                document.body.style.transform = 'translateY(20px)';
+                document.body.style.transition = 'all 0.5s ease';
+                
+                // Navigate after animation completes
+                setTimeout(() => {
+                    window.location.href = this.getAttribute('href');
+                }, 500);
+            });
+        }
+        });
+
+
+    </script>
+</body>
+</html>

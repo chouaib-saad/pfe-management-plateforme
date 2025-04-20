@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - Plateforme PFE</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/buttons.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo img {
+            height: 40px;
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1rem 0;
+        }
+        
+        .sidebar-menu-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem 0 0.5rem 1rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .form-check-label {
+            color: var(--text-secondary);
+        }
+        
+        .form-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-blue);
+        }
+        
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px var(--primary-blue);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .setting-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .color-option.active {
+            border-color: var(--text-primary);
+            transform: scale(1.1);
+        }
+        
+        .color-blue {
+            background-color: #007AFF;
+        }
+        
+        .color-green {
+            background-color: #34C759;
+        }
+        
+        .color-purple {
+            background-color: #AF52DE;
+        }
+        
+        .color-orange {
+            background-color: #FF9500;
+        }
+        
+        .color-red {
+            background-color: #FF3B30;
+        }
+        
+        .backup-history {
+            margin-top: 1rem;
+        }
+        
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .backup-item:last-child {
+            border-bottom: none;
+        }
+        
+        .backup-date {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .backup-size {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-icon:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .btn-icon-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .btn-icon-primary:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .btn-icon-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .btn-icon-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-label {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .notification-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+        
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .language-option:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .language-option.active {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .language-flag {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+        }
+        
+        .language-name {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .language-native {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem 0.5rem;
+            }
+            
+            .sidebar-logo-text {
+                display: none;
+            }
+            
+            .sidebar-menu-item span {
+                display: none;
+            }
+            
+            .sidebar-menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .sidebar-menu-item i {
+                margin-right: 0;
+            }
+            
+            .sidebar-menu-title {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span class="sidebar-logo-text">PFE Platform</span>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="sidebar-menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Tableau de bord</span>
+                </a>
+                
+                <a href="pfe-management.html" class="sidebar-menu-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Gestion des PFE</span>
+                </a>
+                
+                <a href="excel-import.html" class="sidebar-menu-item">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Import Excel</span>
+                </a>
+                
+                <a href="jury-management.html" class="sidebar-menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Gestion des jurys</span>
+                </a>
+                
+                <a href="calendar.html" class="sidebar-menu-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendrier</span>
+                </a>
+                
+                <a href="statistics.html" class="sidebar-menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistiques</span>
+                </a>
+                
+                <a href="teachers.html" class="sidebar-menu-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Enseignants</span>
+                </a>
+                
+                <div class="sidebar-divider"></div>
+                
+                <a href="settings.html" class="sidebar-menu-item active">
+                    <i class="fas fa-cog"></i>
+                    <span>Paramètres</span>
+                </a>
+                
+                <a href="../auth/login.html" class="sidebar-menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Paramètres</h1>
+                
+                <div class="page-actions">
+                    <button class="btn btn-primary" id="saveSettingsBtn">
+                        <i class="fas fa-save"></i>
+                        <span>Enregistrer les modifications</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="general">Général</div>
+                <div class="tab" data-tab="appearance">Apparence</div>
+                <div class="tab" data-tab="notifications">Notifications</div>
+                <div class="tab" data-tab="language">Langue</div>
+                <div class="tab" data-tab="backup">Sauvegarde et restauration</div>
+            </div>
+            
+            <!-- Tab Content: General -->
+            <div class="tab-content active" id="general-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Paramètres généraux</h2>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Informations du département</div>
+                            <div class="setting-description">Informations générales sur le département</div>
+                        </div>
+                        <button class="btn btn-outline-primary" id="editDepartmentBtn">
+                            <i class="fas fa-edit"></i>
+                            <span>Modifier</span>
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="departmentName" class="form-label">Nom du département</label>
+                        <input type="text" id="departmentName" class="form-control" value="Département d'Informatique">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="departmentHead" class="form-label">Chef de département</label>
+                        <input type="text" id="departmentHead" class="form-control" value="Dr. Kamel Hamrouni">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="departmentEmail" class="form-label">Email du département</label>
+                        <input type="email" id="departmentEmail" class="form-control" value="dept.info@issatso.u-sousse.tn">
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Année académique</div>
+                            <div class="setting-description">Définir l'année académique actuelle</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="academicYear">
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026" selected>2025-2026</option>
+                            <option value="2026-2027">2026-2027</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Période de soutenance</div>
+                            <div class="setting-description">Définir la période de soutenance des PFE</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="date" class="form-control" id="defenseStartDate" value="2025-06-10" style="width: 150px;">
+                            <span>à</span>
+                            <input type="date" class="form-control" id="defenseEndDate" value="2025-06-30" style="width: 150px;">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Règle de participation aux jurys</div>
+                            <div class="setting-description">Nombre de jurys par projet encadré</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="juryRatio">
+                            <option value="2">2x</option>
+                            <option value="3" selected>3x</option>
+                            <option value="4">4x</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Activer l'assistant IA</div>
+                            <div class="setting-description">Activer l'assistant IA pour aider à la gestion des PFE</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="aiAssistantToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Mode de mappage Excel</div>
+                            <div class="setting-description">Choisir le mode de mappage des colonnes Excel</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="excelMappingMode">
+                            <option value="manual">Manuel</option>
+                            <option value="auto" selected>Automatique (IA)</option>
+                            <option value="template">Utiliser un modèle</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Appearance -->
+            <div class="tab-content" id="appearance-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Apparence</h2>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Thème</div>
+                            <div class="setting-description">Choisir le thème de l'interface</div>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-outline-primary active" id="lightThemeBtn">
+                                <i class="fas fa-sun"></i>
+                                <span>Clair</span>
+                            </button>
+                            <button class="btn btn-outline-primary" id="darkThemeBtn">
+                                <i class="fas fa-moon"></i>
+                                <span>Sombre</span>
+                            </button>
+                            <button class="btn btn-outline-primary" id="systemThemeBtn">
+                                <i class="fas fa-laptop"></i>
+                                <span>Système</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Couleur principale</div>
+                            <div class="setting-description">Choisir la couleur principale de l'interface</div>
+                        </div>
+                        <div class="color-picker">
+                            <div class="color-option color-blue active" data-color="blue"></div>
+                            <div class="color-option color-green" data-color="green"></div>
+                            <div class="color-option color-purple" data-color="purple"></div>
+                            <div class="color-option color-orange" data-color="orange"></div>
+                            <div class="color-option color-red" data-color="red"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Animations</div>
+                            <div class="setting-description">Activer les animations de l'interface</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="animationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Mode compact</div>
+                            <div class="setting-description">Réduire l'espacement entre les éléments</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="compactModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Taille de la police</div>
+                            <div class="setting-description">Ajuster la taille de la police</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="fontSize">
+                            <option value="small">Petite</option>
+                            <option value="medium" selected>Moyenne</option>
+                            <option value="large">Grande</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Notifications -->
+            <div class="tab-content" id="notifications-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Notifications</h2>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Notifications par email</div>
+                            <div class="notification-description">Recevoir des notifications par email</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailNotificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Notifications dans l'application</div>
+                            <div class="notification-description">Recevoir des notifications dans l'application</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="appNotificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Notifications de nouvelles soutenances</div>
+                            <div class="notification-description">Être notifié lorsqu'une nouvelle soutenance est programmée</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="defenseNotificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Notifications de modifications</div>
+                            <div class="notification-description">Être notifié lorsqu'une soutenance est modifiée</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="modificationNotificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Rappels</div>
+                            <div class="notification-description">Recevoir des rappels avant les soutenances</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reminderNotificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div>
+                            <div class="notification-label">Délai de rappel</div>
+                            <div class="notification-description">Délai avant la soutenance pour recevoir un rappel</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="reminderDelay">
+                            <option value="1h">1 heure</option>
+                            <option value="3h">3 heures</option>
+                            <option value="12h">12 heures</option>
+                            <option value="24h" selected>24 heures</option>
+                            <option value="48h">48 heures</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Language -->
+            <div class="tab-content" id="language-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Langue</h2>
+                    </div>
+                    
+                    <div class="language-option active">
+                        <img src="https://flagcdn.com/w40/fr.png" alt="Français" class="language-flag">
+                        <div>
+                            <div class="language-name">Français</div>
+                            <div class="language-native">Français</div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option">
+                        <img src="https://flagcdn.com/w40/gb.png" alt="English" class="language-flag">
+                        <div>
+                            <div class="language-name">Anglais</div>
+                            <div class="language-native">English</div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option">
+                        <img src="https://flagcdn.com/w40/tn.png" alt="العربية" class="language-flag">
+                        <div>
+                            <div class="language-name">Arabe</div>
+                            <div class="language-native">العربية</div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option">
+                        <img src="https://flagcdn.com/w40/es.png" alt="Español" class="language-flag">
+                        <div>
+                            <div class="language-name">Espagnol</div>
+                            <div class="language-native">Español</div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option">
+                        <img src="https://flagcdn.com/w40/de.png" alt="Deutsch" class="language-flag">
+                        <div>
+                            <div class="language-name">Allemand</div>
+                            <div class="language-native">Deutsch</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Format de date et heure</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dateFormat" class="form-label">Format de date</label>
+                        <select id="dateFormat" class="form-select">
+                            <option value="dd/mm/yyyy" selected>JJ/MM/AAAA</option>
+                            <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
+                            <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timeFormat" class="form-label">Format d'heure</label>
+                        <select id="timeFormat" class="form-select">
+                            <option value="24h" selected>24 heures</option>
+                            <option value="12h">12 heures (AM/PM)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Backup -->
+            <div class="tab-content" id="backup-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Sauvegarde et restauration</h2>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Sauvegardes automatiques</div>
+                            <div class="setting-description">Activer les sauvegardes automatiques</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoBackupToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Fréquence des sauvegardes</div>
+                            <div class="setting-description">Définir la fréquence des sauvegardes automatiques</div>
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="backupFrequency">
+                            <option value="daily">Quotidienne</option>
+                            <option value="weekly" selected>Hebdomadaire</option>
+                            <option value="monthly">Mensuelle</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Sauvegarde manuelle</div>
+                            <div class="setting-description">Créer une sauvegarde manuelle de toutes les données</div>
+                        </div>
+                        <button class="btn btn-primary" id="manualBackupBtn">
+                            <i class="fas fa-download"></i>
+                            <span>Créer une sauvegarde</span>
+                        </button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Restaurer une sauvegarde</div>
+                            <div class="setting-description">Restaurer les données à partir d'une sauvegarde</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="file" id="restoreBackupFile" style="display: none;">
+                            <button class="btn btn-outline-primary" id="restoreBackupBtn">
+                                <i class="fas fa-upload"></i>
+                                <span>Choisir un fichier</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-header">
+                        <h2 class="card-title">Historique des sauvegardes</h2>
+                    </div>
+                    
+                    <div class="backup-history">
+                        <div class="backup-item">
+                            <div>
+                                <div class="backup-date">19 avril 2025, 10:30</div>
+                                <div class="backup-size">2.4 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-icon btn-icon-primary" data-tooltip="Restaurer">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button class="btn-icon" data-tooltip="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-icon btn-icon-danger" data-tooltip="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-item">
+                            <div>
+                                <div class="backup-date">12 avril 2025, 08:15</div>
+                                <div class="backup-size">2.3 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-icon btn-icon-primary" data-tooltip="Restaurer">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button class="btn-icon" data-tooltip="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-icon btn-icon-danger" data-tooltip="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-item">
+                            <div>
+                                <div class="backup-date">5 avril 2025, 09:45</div>
+                                <div class="backup-size">2.2 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-icon btn-icon-primary" data-tooltip="Restaurer">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button class="btn-icon" data-tooltip="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-icon btn-icon-danger" data-tooltip="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot Toggle -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot"></i>
+                Assistant PFE
+            </div>
+            <div class="chatbot-controls">
+                <button class="chatbot-control-button" id="themeToggleChat">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="chatbot-close" id="chatbotClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <!-- Messages will be added here dynamically -->
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <button class="chatbot-voice" id="chatbotVoice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="chatbot-send" id="chatbotSend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Tab switching
+            $('.tab').click(function() {
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                
+                const tab = $(this).data('tab');
+                
+                // Hide all tab contents
+                $('.tab-content').removeClass('active');
+                
+                // Show the selected tab content
+                $(`#${tab}-tab`).addClass('active');
+            });
+            
+            // Theme buttons
+            $('#lightThemeBtn, #darkThemeBtn, #systemThemeBtn').click(function() {
+                $('#lightThemeBtn, #darkThemeBtn, #systemThemeBtn').removeClass('active');
+                $(this).addClass('active');
+                
+                const theme = $(this).attr('id').replace('ThemeBtn', '');
+                
+                if (theme === 'light') {
+                    $('body').attr('data-theme', 'light');
+                } else if (theme === 'dark') {
+                    $('body').attr('data-theme', 'dark');
+                } else {
+                    // System theme would check the user's system preference
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    $('body').attr('data-theme', prefersDark ? 'dark' : 'light');
+                }
+            });
+            
+            // Color picker
+            $('.color-option').click(function() {
+                $('.color-option').removeClass('active');
+                $(this).addClass('active');
+                
+                const color = $(this).data('color');
+                console.log(`Selected color: ${color}`);
+                
+                // Here you would apply the selected color to the UI
+                // This would typically involve changing CSS variables
+            });
+            
+            // Language options
+            $('.language-option').click(function() {
+                $('.language-option').removeClass('active');
+                $(this).addClass('active');
+            });
+            
+            // Save settings
+            $('#saveSettingsBtn').click(function() {
+                // Here you would save all settings
+                // For demo purposes, we'll just show an alert
+                alert('Paramètres enregistrés avec succès !');
+            });
+            
+            // Manual backup
+            $('#manualBackupBtn').click(function() {
+                // Here you would trigger a manual backup
+                // For demo purposes, we'll just show an alert
+                alert('Sauvegarde créée avec succès !');
+            });
+            
+            // Restore backup
+            $('#restoreBackupBtn').click(function() {
+                // Trigger file input click
+                $('#restoreBackupFile').click();
+            });
+            
+            // Handle file selection for restore
+            $('#restoreBackupFile').change(function() {
+                const fileName = $(this).val().split('\\').pop();
+                
+                if (fileName) {
+                    // Here you would handle the file upload and restoration
+                    // For demo purposes, we'll just show an alert
+                    alert(`Restauration à partir de "${fileName}" en cours...`);
+                }
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeToggleChat = document.getElementById('themeToggleChat');
+            const body = document.body;
+            
+            function toggleTheme() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                
+                themeToggle.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                    
+                themeToggleChat.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                
+                localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            }
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            themeToggleChat.addEventListener('click', toggleTheme);
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-theme', savedTheme);
+            
+            themeToggle.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+                
+            themeToggleChat.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+        });
+    </script>
+</body>
+</html>

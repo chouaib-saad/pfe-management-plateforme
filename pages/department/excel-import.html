@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importation Excel - PFE Platform</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/buttons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- SheetJS (xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* Stepper */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 0;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 25%;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary-blue);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .step.completed .step-label {
+            color: var(--success-color);
+        }
+        
+        /* Step Content */
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-text {
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-info {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .file-upload-input {
+            display: none;
+        }
+        
+        .file-preview {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-preview-icon {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            margin-right: 1rem;
+        }
+        
+        .file-preview-info {
+            flex: 1;
+        }
+        
+        .file-preview-name {
+            font-weight: var(--font-weight-medium);
+            margin-bottom: 0.25rem;
+        }
+        
+        .file-preview-size {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .file-preview-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .file-preview-action {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-preview-action:hover {
+            background-color: var(--bg-quaternary);
+        }
+        
+        .file-preview-action.delete:hover {
+            background-color: rgba(255, 69, 58, 0.1);
+            color: var(--danger-color);
+        }
+        
+        /* Column Mapping */
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .mapping-table th, .mapping-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .mapping-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+        
+        .mapping-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .mapping-select {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .mapping-select:focus {
+            border-color: var(--primary-blue);
+        }
+        
+        /* Data Validation */
+        .validation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .validation-table th, .validation-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .validation-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .validation-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .validation-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+        }
+        
+        .validation-error {
+            color: var(--danger-color);
+            font-size: var(--font-size-sm);
+            margin-top: 0.25rem;
+        }
+        
+        .validation-warning {
+            color: var(--warning-color);
+            font-size: var(--font-size-sm);
+            margin-top: 0.25rem;
+        }
+        
+        .validation-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .validation-status.valid {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+        
+        .validation-status.invalid {
+            background-color: rgba(255, 69, 58, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .validation-status.warning {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        /* Import Summary */
+        .import-summary {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .import-summary-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 1rem;
+        }
+        
+        .import-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .import-summary-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .import-summary-label {
+            color: var(--text-secondary);
+        }
+        
+        .import-summary-value {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .import-progress {
+            margin-bottom: 1.5rem;
+        }
+        
+        .import-progress-bar {
+            height: 8px;
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .import-progress-fill {
+            height: 100%;
+            background-color: var(--primary-blue);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .import-progress-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        /* Step Navigation */
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo" class="sidebar-logo">
+            <h2 class="sidebar-title">PFE Platform</h2>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="sidebar-link">
+                <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                <span>Tableau de bord</span>
+            </a>
+            
+            <a href="excel-import.html" class="sidebar-link active">
+                <i class="fas fa-file-excel sidebar-icon"></i>
+                <span>Import Excel</span>
+            </a>
+            
+            <a href="jury-management.html" class="sidebar-link">
+                <i class="fas fa-users sidebar-icon"></i>
+                <span>Gestion des Jurys</span>
+            </a>
+            
+            <a href="calendar.html" class="sidebar-link">
+                <i class="fas fa-calendar-alt sidebar-icon"></i>
+                <span>Calendrier</span>
+            </a>
+            
+            <a href="statistics.html" class="sidebar-link">
+                <i class="fas fa-chart-bar sidebar-icon"></i>
+                <span>Statistiques</span>
+            </a>
+            
+            <a href="teachers.html" class="sidebar-link">
+                <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                <span>Enseignants</span>
+            </a>
+            
+            <a href="settings.html" class="sidebar-link">
+                <i class="fas fa-cog sidebar-icon"></i>
+                <span>Paramètres</span>
+            </a>
+            
+            <a href="../auth/login.html" class="sidebar-link">
+                <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                <span>Déconnexion</span>
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="InputContainer">
+                  <input type="text" name="text" class="input" id="input" placeholder="Rechercher...">
+                  
+                  <label for="input" class="labelforsearch">
+                    <svg viewBox="0 0 512 512" class="searchIcon"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
+                  </label>
+                  <div class="border"></div>
+                
+                  <button class="micButton"><svg viewBox="0 0 384 512" class="micIcon"><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"></path></svg>
+                  </button>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="header-notification-count">3</span>
+                </div>
+                
+                <div class="header-user">
+                    <img src="https://ui-avatars.com/api/?name=Chef&background=0D8ABC&color=fff" alt="Chef" class="header-user-avatar">
+                    <div class="header-user-info">
+                        <div class="header-user-name">Dr. Nadia Alaoui</div>
+                        <div class="header-user-role">Chef de département</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">Importation Excel</h1>
+                <div class="content-breadcrumb">
+                    <a href="dashboard.html">Tableau de bord</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Import Excel</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="stepper">
+                        <div class="step active" id="step1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Importer le fichier</div>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Mapper les colonnes</div>
+                        </div>
+                        <div class="step" id="step3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Valider les données</div>
+                        </div>
+                        <div class="step" id="step4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Importer</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 1: File Upload -->
+                    <div class="step-content active" id="step1-content">
+                        <h3 class="card-subtitle">Sélectionnez ou glissez-déposez votre fichier Excel</h3>
+                        <p class="card-description">Le fichier doit contenir les informations des PFE à importer. Formats supportés: .xlsx, .xls</p>
+                        
+                        <div class="file-upload" id="fileUpload">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="file-upload-text">Glissez-déposez votre fichier ici ou cliquez pour parcourir</div>
+                            <div class="file-upload-info">Taille maximale: 10 MB</div>
+                            <input type="file" class="file-upload-input" id="fileInput" accept=".xlsx, .xls">
+                        </div>
+                        
+                        <div class="file-preview" id="filePreview" style="display: none;">
+                            <div class="file-preview-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="file-preview-info">
+                                <div class="file-preview-name" id="fileName"></div>
+                                <div class="file-preview-size" id="fileSize"></div>
+                            </div>
+                            <div class="file-preview-actions">
+                                <div class="file-preview-action delete" id="fileDelete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <div></div>
+                            <button class="btn btn-primary" id="step1Next" disabled>
+                                Continuer <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Column Mapping -->
+                    <div class="step-content" id="step2-content">
+                        <h3 class="card-subtitle">Associez les colonnes Excel aux champs de l'application</h3>
+                        <p class="card-description">Sélectionnez les colonnes de votre fichier Excel qui correspondent aux champs requis pour l'importation.</p>
+                        
+                        <div class="table-responsive">
+                            <table class="mapping-table">
+                                <thead>
+                                    <tr>
+                                        <th>Champ requis</th>
+                                        <th>Colonne Excel</th>
+                                        <th>Aperçu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mappingTableBody">
+                                    <tr>
+                                        <td>ID_PROJECT <span class="text-danger">*</span></td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-id" required>
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-id">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Étudiant <span class="text-danger">*</span></td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-student" required>
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-student">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email <span class="text-danger">*</span></td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-email" required>
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-email">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Titre PFE <span class="text-danger">*</span></td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-title" required>
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-title">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Encadrant <span class="text-danger">*</span></td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-supervisor" required>
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-supervisor">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Président Jury</td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-president">
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-president">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rapporteur</td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-reporter">
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-reporter">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Date/Heure</td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-datetime">
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-datetime">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Salle</td>
+                                        <td>
+                                            <select class="mapping-select" id="mapping-room">
+                                                <option value="">Sélectionner une colonne</option>
+                                            </select>
+                                        </td>
+                                        <td id="preview-room">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button class="btn btn-outline" id="step2Prev">
+                                <i class="fas fa-arrow-left mr-2"></i> Retour
+                            </button>
+                            <button class="btn btn-primary" id="step2Next" disabled>
+                                Continuer <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Data Validation -->
+                    <div class="step-content" id="step3-content">
+                        <h3 class="card-subtitle">Vérifiez et corrigez les erreurs potentielles</h3>
+                        <p class="card-description">Examinez les données importées et corrigez les erreurs avant de finaliser l'importation.</p>
+                        
+                        <div class="validation-summary" id="validationSummary">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span id="validationMessage">Validation en cours...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-table-container">
+                            <table class="validation-table" id="validationTable">
+                                <thead>
+                                    <tr>
+                                        <th>Ligne</th>
+                                        <th>ID_PROJECT</th>
+                                        <th>Étudiant</th>
+                                        <th>Email</th>
+                                        <th>Titre PFE</th>
+                                        <th>Encadrant</th>
+                                        <th>Président Jury</th>
+                                        <th>Rapporteur</th>
+                                        <th>Date/Heure</th>
+                                        <th>Salle</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="validationTableBody">
+                                    <!-- Data will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button class="btn btn-outline" id="step3Prev">
+                                <i class="fas fa-arrow-left mr-2"></i> Retour
+                            </button>
+                            <button class="btn btn-primary" id="step3Next" disabled>
+                                Continuer <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4: Import -->
+                    <div class="step-content" id="step4-content">
+                        <h3 class="card-subtitle">Finalisez l'importation des données</h3>
+                        <p class="card-description">Vérifiez le résumé de l'importation et cliquez sur "Importer" pour finaliser le processus.</p>
+                        
+                        <div class="import-summary">
+                            <h4 class="import-summary-title">Résumé de l'importation</h4>
+                            <div class="import-summary-item">
+                                <div class="import-summary-label">Fichier</div>
+                                <div class="import-summary-value" id="summaryFileName">-</div>
+                            </div>
+                            <div class="import-summary-item">
+                                <div class="import-summary-label">Nombre total de lignes</div>
+                                <div class="import-summary-value" id="summaryTotalRows">0</div>
+                            </div>
+                            <div class="import-summary-item">
+                                <div class="import-summary-label">Lignes valides</div>
+                                <div class="import-summary-value" id="summaryValidRows">0</div>
+                            </div>
+                            <div class="import-summary-item">
+                                <div class="import-summary-label">Lignes avec avertissements</div>
+                                <div class="import-summary-value" id="summaryWarningRows">0</div>
+                            </div>
+                            <div class="import-summary-item">
+                                <div class="import-summary-label">Lignes avec erreurs</div>
+                                <div class="import-summary-value" id="summaryErrorRows">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="import-progress" id="importProgress" style="display: none;">
+                            <div class="import-progress-bar">
+                                <div class="import-progress-fill" id="importProgressFill"></div>
+                            </div>
+                            <div class="import-progress-text" id="importProgressText">0%</div>
+                        </div>
+                        
+                        <div class="import-result" id="importResult" style="display: none;">
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span>Importation réussie ! <span id="importSuccessCount">0</span> PFE ont été importés avec succès.</span>
+                            </div>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button class="btn btn-outline" id="step4Prev">
+                                <i class="fas fa-arrow-left mr-2"></i> Retour
+                            </button>
+                            <button class="btn btn-primary" id="importBtn">
+                                <i class="fas fa-file-import mr-2"></i> Importer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Chatbot -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot mr-2"></i>
+                Assistant PFE
+            </div>
+            <button class="chatbot-close" id="chatbotClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="chatbot-message bot">
+                Bonjour ! Je suis l'assistant virtuel de la plateforme PFE. Comment puis-je vous aider aujourd'hui ?
+                
+                <div class="chatbot-suggestions">
+                    <div class="chatbot-suggestion">Comment importer un fichier Excel ?</div>
+                    <div class="chatbot-suggestion">Quel format de fichier est accepté ?</div>
+                    <div class="chatbot-suggestion">Comment mapper les colonnes ?</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" placeholder="Tapez votre message..." id="chatbotInput">
+                <button class="chatbot-send" id="chatbotSend">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+        
+        // Excel Import Functionality
+        let excelData = null;
+        let excelHeaders = [];
+        let mappedData = [];
+        let validationResults = {
+            valid: 0,
+            warning: 0,
+            error: 0,
+            total: 0
+        };
+        
+        // Step 1: File Upload
+        const fileUpload = document.getElementById('fileUpload');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileDelete = document.getElementById('fileDelete');
+        const step1Next = document.getElementById('step1Next');
+        
+        fileUpload.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--primary-blue)';
+            fileUpload.style.backgroundColor = 'rgba(0, 122, 255, 0.05)';
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.style.borderColor = 'var(--border-color)';
+            fileUpload.style.backgroundColor = 'transparent';
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--border-color)';
+            fileUpload.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+        
+        fileDelete.addEventListener('click', () => {
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            fileUpload.style.display = 'block';
+            step1Next.disabled = true;
+            excelData = null;
+            excelHeaders = [];
+        });
+        
+        function handleFile(file) {
+            // Check file type
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+                alert('Format de fichier non supporté. Veuillez sélectionner un fichier Excel (.xlsx, .xls).');
+                return;
+            }
+            
+            // Check file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Le fichier est trop volumineux. La taille maximale est de 10 MB.');
+                return;
+            }
+            
+            // Update file preview
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            filePreview.style.display = 'flex';
+            fileUpload.style.display = 'none';
+            
+            // Read Excel file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Get first sheet
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Convert to JSON
+                    excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    // Get headers (first row)
+                    if (excelData.length > 0) {
+                        excelHeaders = excelData[0];
+                        
+                        // Enable next button
+                        step1Next.disabled = false;
+                    } else {
+                        alert('Le fichier Excel est vide.');
+                        fileDelete.click();
+                    }
+                } catch (error) {
+                    console.error('Error reading Excel file:', error);
+                    alert('Erreur lors de la lecture du fichier Excel. Veuillez vérifier le format du fichier.');
+                    fileDelete.click();
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Step 2: Column Mapping
+        const mappingSelects = document.querySelectorAll('.mapping-select');
+        const step2Next = document.getElementById('step2Next');
+        
+        function populateMappingSelects() {
+            // Clear existing options
+            mappingSelects.forEach(select => {
+                // Keep the first option (placeholder)
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+            });
+            
+            // Add options from Excel headers
+            excelHeaders.forEach((header, index) => {
+                mappingSelects.forEach(select => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = header;
+                    select.appendChild(option);
+                    
+                    // Auto-select if header name matches field name
+                    const fieldName = select.id.replace('mapping-', '');
+                    if (header.toLowerCase().includes(fieldName.toLowerCase())) {
+                        select.value = index;
+                        updatePreview(fieldName, index);
+                    }
+                });
+            });
+            
+            checkRequiredMappings();
+        }
+        
+        mappingSelects.forEach(select => {
+            select.addEventListener('change', () => {
+                const fieldName = select.id.replace('mapping-', '');
+                updatePreview(fieldName, select.value);
+                checkRequiredMappings();
+            });
+        });
+        
+        function updatePreview(fieldName, columnIndex) {
+            const previewElement = document.getElementById(`preview-${fieldName}`);
+            
+            if (columnIndex === '') {
+                previewElement.textContent = '-';
+                return;
+            }
+            
+            // Get preview data (first 3 rows)
+            const previewData = [];
+            for (let i = 1; i < Math.min(4, excelData.length); i++) {
+                const row = excelData[i];
+                if (row && row[columnIndex] !== undefined) {
+                    previewData.push(row[columnIndex]);
+                }
+            }
+            
+            previewElement.textContent = previewData.join(', ');
+        }
+        
+        function checkRequiredMappings() {
+            // Check if all required fields are mapped
+            const requiredSelects = document.querySelectorAll('.mapping-select[required]');
+            let allMapped = true;
+            
+            requiredSelects.forEach(select => {
+                if (select.value === '') {
+                    allMapped = false;
+                }
+            });
+            
+            step2Next.disabled = !allMapped;
+        }
+        
+        // Step 3: Data Validation
+        const validationTableBody = document.getElementById('validationTableBody');
+        const validationMessage = document.getElementById('validationMessage');
+        const step3Next = document.getElementById('step3Next');
+        
+        function validateData() {
+            // Reset validation results
+            validationResults = {
+                valid: 0,
+                warning: 0,
+                error: 0,
+                total: 0
+            };
+            
+            // Clear validation table
+            validationTableBody.innerHTML = '';
+            
+            // Get mapped columns
+            const mappedColumns = {
+                id: document.getElementById('mapping-id').value,
+                student: document.getElementById('mapping-student').value,
+                email: document.getElementById('mapping-email').value,
+                title: document.getElementById('mapping-title').value,
+                supervisor: document.getElementById('mapping-supervisor').value,
+                president: document.getElementById('mapping-president').value,
+                reporter: document.getElementById('mapping-reporter').value,
+                datetime: document.getElementById('mapping-datetime').value,
+                room: document.getElementById('mapping-room').value
+            };
+            
+            // Process data rows (skip header row)
+            mappedData = [];
+            for (let i = 1; i < excelData.length; i++) {
+                const row = excelData[i];
+                const rowNumber = i + 1; // Excel row number (1-based)
+                
+                // Skip empty rows
+                if (!row || row.length === 0) continue;
+                
+                const mappedRow = {
+                    rowNumber: rowNumber,
+                    id: mappedColumns.id !== '' ? row[mappedColumns.id] : '',
+                    student: mappedColumns.student !== '' ? row[mappedColumns.student] : '',
+                    email: mappedColumns.email !== '' ? row[mappedColumns.email] : '',
+                    title: mappedColumns.title !== '' ? row[mappedColumns.title] : '',
+                    supervisor: mappedColumns.supervisor !== '' ? row[mappedColumns.supervisor] : '',
+                    president: mappedColumns.president !== '' ? row[mappedColumns.president] : '',
+                    reporter: mappedColumns.reporter !== '' ? row[mappedColumns.reporter] : '',
+                    datetime: mappedColumns.datetime !== '' ? row[mappedColumns.datetime] : '',
+                    room: mappedColumns.room !== '' ? row[mappedColumns.room] : '',
+                    errors: [],
+                    warnings: []
+                };
+                
+                // Validate required fields
+                if (!mappedRow.id) {
+                    mappedRow.errors.push('ID_PROJECT est requis');
+                }
+                
+                if (!mappedRow.student) {
+                    mappedRow.errors.push('Étudiant est requis');
+                }
+                
+                if (!mappedRow.email) {
+                    mappedRow.errors.push('Email est requis');
+                } else if (!isValidEmail(mappedRow.email)) {
+                    mappedRow.errors.push('Format d\'email invalide');
+                }
+                
+                if (!mappedRow.title) {
+                    mappedRow.errors.push('Titre PFE est requis');
+                }
+                
+                if (!mappedRow.supervisor) {
+                    mappedRow.errors.push('Encadrant est requis');
+                }
+                
+                // Add warnings for optional fields
+                if (!mappedRow.president) {
+                    mappedRow.warnings.push('Président Jury non spécifié');
+                }
+                
+                if (!mappedRow.reporter) {
+                    mappedRow.warnings.push('Rapporteur non spécifié');
+                }
+                
+                if (!mappedRow.datetime) {
+                    mappedRow.warnings.push('Date/Heure non spécifiée');
+                }
+                
+                if (!mappedRow.room) {
+                    mappedRow.warnings.push('Salle non spécifiée');
+                } else if (!isValidRoom(mappedRow.room)) {
+                    mappedRow.warnings.push('Format de salle invalide (doit être au format Bloc+Numéro, ex: I12)');
+                }
+                
+                // Determine row status
+                let status;
+                if (mappedRow.errors.length > 0) {
+                    status = 'invalid';
+                    validationResults.error++;
+                } else if (mappedRow.warnings.length > 0) {
+                    status = 'warning';
+                    validationResults.warning++;
+                } else {
+                    status = 'valid';
+                    validationResults.valid++;
+                }
+                
+                validationResults.total++;
+                
+                // Add row to mapped data
+                mappedRow.status = status;
+                mappedData.push(mappedRow);
+                
+                // Create table row
+                const tr = document.createElement('tr');
+                
+                // Add cells
+                tr.innerHTML = `
+                    <td>${rowNumber}</td>
+                    <td>${mappedRow.id || '-'}</td>
+                    <td>${mappedRow.student || '-'}</td>
+                    <td>${mappedRow.email || '-'}</td>
+                    <td>${mappedRow.title || '-'}</td>
+                    <td>${mappedRow.supervisor || '-'}</td>
+                    <td>${mappedRow.president || '-'}</td>
+                    <td>${mappedRow.reporter || '-'}</td>
+                    <td>${mappedRow.datetime || '-'}</td>
+                    <td>${mappedRow.room || '-'}</td>
+                    <td>
+                        <span class="validation-status ${status}">${getStatusText(status)}</span>
+                        ${mappedRow.errors.map(error => `<div class="validation-error"><i class="fas fa-exclamation-circle"></i> ${error}</div>`).join('')}
+                        ${mappedRow.warnings.map(warning => `<div class="validation-warning"><i class="fas fa-exclamation-triangle"></i> ${warning}</div>`).join('')}
+                    </td>
+                `;
+                
+                validationTableBody.appendChild(tr);
+            }
+            
+            // Update validation message
+            validationMessage.textContent = `${validationResults.total} lignes analysées: ${validationResults.valid} valides, ${validationResults.warning} avec avertissements, ${validationResults.error} avec erreurs.`;
+            
+            // Update summary
+            document.getElementById('summaryFileName').textContent = fileName.textContent;
+            document.getElementById('summaryTotalRows').textContent = validationResults.total;
+            document.getElementById('summaryValidRows').textContent = validationResults.valid;
+            document.getElementById('summaryWarningRows').textContent = validationResults.warning;
+            document.getElementById('summaryErrorRows').textContent = validationResults.error;
+            
+            // Enable next button if there are no errors
+            step3Next.disabled = validationResults.error > 0;
+            
+            // Show validation summary with appropriate alert type
+            const validationSummary = document.getElementById('validationSummary');
+            const alert = validationSummary.querySelector('.alert');
+            
+            if (validationResults.error > 0) {
+                alert.className = 'alert alert-danger';
+                alert.querySelector('i').className = 'fas fa-exclamation-circle mr-2';
+            } else if (validationResults.warning > 0) {
+                alert.className = 'alert alert-warning';
+                alert.querySelector('i').className = 'fas fa-exclamation-triangle mr-2';
+            } else {
+                alert.className = 'alert alert-success';
+                alert.querySelector('i').className = 'fas fa-check-circle mr-2';
+            }
+        }
+        
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function isValidRoom(room) {
+            // Check if room is in format Bloc+Number (e.g., I12)
+            const re = /^[A-Z][0-9]+$/;
+            return re.test(room);
+        }
+        
+        function getStatusText(status) {
+            switch (status) {
+                case 'valid':
+                    return 'Valide';
+                case 'warning':
+                    return 'Avertissement';
+                case 'invalid':
+                    return 'Erreur';
+                default:
+                    return '';
+            }
+        }
+        
+        // Step 4: Import
+        const importBtn = document.getElementById('importBtn');
+        const importProgress = document.getElementById('importProgress');
+        const importProgressFill = document.getElementById('importProgressFill');
+        const importProgressText = document.getElementById('importProgressText');
+        const importResult = document.getElementById('importResult');
+        const importSuccessCount = document.getElementById('importSuccessCount');
+        
+        importBtn.addEventListener('click', () => {
+            // Show progress bar
+            importProgress.style.display = 'block';
+            importBtn.disabled = true;
+            
+            // Simulate import process
+            let progress = 0;
+            const totalValid = validationResults.valid + validationResults.warning;
+            const interval = setInterval(() => {
+                progress += 5;
+                importProgressFill.style.width = `${progress}%`;
+                importProgressText.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Show result
+                    importResult.style.display = 'block';
+                    importSuccessCount.textContent = totalValid;
+                    
+                    // Update step status
+                    document.getElementById('step4').classList.add('completed');
+                    
+                    // In a real app, this would send data to the server
+                    console.log('Imported data:', mappedData.filter(row => row.status !== 'invalid'));
+                }
+            }, 200);
+        });
+        
+        // Step Navigation
+        const steps = document.querySelectorAll('.step');
+        const stepContents = document.querySelectorAll('.step-content');
+        
+        // Step 1 to Step 2
+        step1Next.addEventListener('click', () => {
+            // Update step status
+            steps[0].classList.remove('active');
+            steps[0].classList.add('completed');
+            steps[1].classList.add('active');
+            
+            // Show step 2 content
+            stepContents[0].classList.remove('active');
+            stepContents[1].classList.add('active');
+            
+            // Populate mapping selects
+            populateMappingSelects();
+        });
+        
+        // Step 2 to Step 1
+        document.getElementById('step2Prev').addEventListener('click', () => {
+            // Update step status
+            steps[1].classList.remove('active');
+            steps[0].classList.remove('completed');
+            steps[0].classList.add('active');
+            
+            // Show step 1 content
+            stepContents[1].classList.remove('active');
+            stepContents[0].classList.add('active');
+        });
+        
+        // Step 2 to Step 3
+        step2Next.addEventListener('click', () => {
+            // Update step status
+            steps[1].classList.remove('active');
+            steps[1].classList.add('completed');
+            steps[2].classList.add('active');
+            
+            // Show step 3 content
+            stepContents[1].classList.remove('active');
+            stepContents[2].classList.add('active');
+            
+            // Validate data
+            validateData();
+        });
+        
+        // Step 3 to Step 2
+        document.getElementById('step3Prev').addEventListener('click', () => {
+            // Update step status
+            steps[2].classList.remove('active');
+            steps[1].classList.remove('completed');
+            steps[1].classList.add('active');
+            
+            // Show step 2 content
+            stepContents[2].classList.remove('active');
+            stepContents[1].classList.add('active');
+        });
+        
+        // Step 3 to Step 4
+        step3Next.addEventListener('click', () => {
+            // Update step status
+            steps[2].classList.remove('active');
+            steps[2].classList.add('completed');
+            steps[3].classList.add('active');
+            
+            // Show step 4 content
+            stepContents[2].classList.remove('active');
+            stepContents[3].classList.add('active');
+        });
+        
+        // Step 4 to Step 3
+        document.getElementById('step4Prev').addEventListener('click', () => {
+            // Update step status
+            steps[3].classList.remove('active');
+            steps[2].classList.remove('completed');
+            steps[2].classList.add('active');
+            
+            // Show step 3 content
+            stepContents[3].classList.remove('active');
+            stepContents[2].classList.add('active');
+        });
+        
+        // Chatbot
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotBody = document.getElementById('chatbotBody');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+        
+        // Toggle chatbot
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.classList.add('active');
+            chatbotToggle.style.display = 'none';
+        });
+        
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+            chatbotToggle.style.display = 'flex';
+        });
+        
+        // Send message
+        function sendMessage() {
+            const message = chatbotInput.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chatbot-message user';
+                userMessage.textContent = message;
+                chatbotBody.appendChild(userMessage);
+                
+                // Clear input
+                chatbotInput.value = '';
+                
+                // Scroll to bottom
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+                
+                // Simulate bot response after a short delay
+                setTimeout(() => {
+                    let botResponse;
+                    
+                    // Simple response logic based on keywords
+                    if (message.toLowerCase().includes('importer') || message.toLowerCase().includes('fichier')) {
+                        botResponse = "Pour importer un fichier Excel, suivez ces étapes :\n1. Cliquez sur la zone de dépôt ou glissez-déposez votre fichier Excel\n2. Associez les colonnes de votre fichier aux champs requis\n3. Vérifiez les données et corrigez les erreurs éventuelles\n4. Cliquez sur 'Importer' pour finaliser le processus";
+                    } else if (message.toLowerCase().includes('format') || message.toLowerCase().includes('accepté')) {
+                        botResponse = "Les formats de fichier acceptés sont .xlsx et .xls (Microsoft Excel). La taille maximale du fichier est de 10 MB.";
+                    } else if (message.toLowerCase().includes('mapper') || message.toLowerCase().includes('colonne')) {
+                        botResponse = "Pour mapper les colonnes, sélectionnez dans chaque menu déroulant la colonne de votre fichier Excel qui correspond au champ requis. Les champs marqués d'un astérisque (*) sont obligatoires. Le système tentera de mapper automatiquement les colonnes dont les noms correspondent aux champs.";
+                    } else if (message.toLowerCase().includes('erreur') || message.toLowerCase().includes('valider')) {
+                        botResponse = "Lors de la validation des données, le système vérifie que tous les champs obligatoires sont remplis et que les formats sont corrects. Les erreurs sont affichées en rouge et doivent être corrigées avant de pouvoir continuer. Les avertissements sont affichés en orange et concernent des champs optionnels ou des formats recommandés.";
+                    } else if (message.toLowerCase().includes('salle')) {
+                        botResponse = "Le format de salle doit être au format Bloc+Numéro, par exemple I12, J5, K20, etc. Les blocs disponibles sont I, J, K, M et G.";
+                    } else {
+                        botResponse = "Je ne suis pas sûr de comprendre votre question. Voici quelques sujets sur lesquels je peux vous aider :";
+                        
+                        // Add suggestions
+                        const suggestions = document.createElement('div');
+                        suggestions.className = 'chatbot-suggestions';
+                        
+                        const suggestion1 = document.createElement('div');
+                        suggestion1.className = 'chatbot-suggestion';
+                        suggestion1.textContent = "Comment importer un fichier Excel ?";
+                        
+                        const suggestion2 = document.createElement('div');
+                        suggestion2.className = 'chatbot-suggestion';
+                        suggestion2.textContent = "Quel format de fichier est accepté ?";
+                        
+                        const suggestion3 = document.createElement('div');
+                        suggestion3.className = 'chatbot-suggestion';
+                        suggestion3.textContent = "Comment mapper les colonnes ?";
+                        
+                        suggestions.appendChild(suggestion1);
+                        suggestions.appendChild(suggestion2);
+                        suggestions.appendChild(suggestion3);
+                        
+                        // Add bot response
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'chatbot-message bot';
+                        botMessage.textContent = botResponse;
+                        botMessage.appendChild(suggestions);
+                        chatbotBody.appendChild(botMessage);
+                        
+                        // Add click event to suggestions
+                        const allSuggestions = document.querySelectorAll('.chatbot-suggestion');
+                        allSuggestions.forEach(suggestion => {
+                            suggestion.addEventListener('click', () => {
+                                chatbotInput.value = suggestion.textContent;
+                                sendMessage();
+                            });
+                        });
+                        
+                        return;
+                    }
+                    
+                    // Add bot response
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chatbot-message bot';
+                    botMessage.textContent = botResponse;
+                    chatbotBody.appendChild(botMessage);
+                    
+                    // Scroll to bottom
+                    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+                }, 1000);
+            }
+        }
+        
+        chatbotSend.addEventListener('click', sendMessage);
+        
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Add click event to initial suggestions
+        const initialSuggestions = document.querySelectorAll('.chatbot-suggestion');
+        initialSuggestions.forEach(suggestion => {
+            suggestion.addEventListener('click', () => {
+                chatbotInput.value = suggestion.textContent;
+                sendMessage();
+            });
+        });
+        
+        // Voice recognition for search
+        const micButton = document.querySelector('.micButton');
+        const searchInput = document.querySelector('.input');
+        
+        if (micButton && 'webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'fr-FR';
+            
+            micButton.addEventListener('click', () => {
+                recognition.start();
+                micButton.style.backgroundColor = 'rgb(255, 230, 230)';
+            });
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                searchInput.value = transcript;
+                micButton.style.backgroundColor = 'transparent';
+            };
+            
+            recognition.onend = () => {
+                micButton.style.backgroundColor = 'transparent';
+            };
+        }
+    </script>
+</body>
+</html>

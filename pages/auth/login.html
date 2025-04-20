@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - PFE Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/sparkle-button.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            transition: all 0.5s ease;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+        
+        .auth-image {
+            flex: 1;
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+        
+        @media (min-width: 992px) {
+            .auth-image {
+                display: flex;
+            }
+        }
+        
+        .auth-image-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+        
+        .auth-image-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-image-text {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .auth-image-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .auth-image-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-image-feature-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .auth-image-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .auth-image-shape {
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .auth-image-shape-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            top: -100px;
+            right: -100px;
+        }
+        
+        .auth-image-shape-2 {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: -50px;
+            left: -50px;
+        }
+        
+        .auth-image-shape-3 {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: 100px;
+            right: 50px;
+        }
+        
+        .auth-form {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .auth-form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .auth-form-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .auth-form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1f4b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-form-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .auth-form-content {
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #1a1f4b;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: #a5b4fc;
+            border-color: #a5b4fc;
+        }
+        
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            cursor: pointer;
+        }
+        
+        .auth-form-footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .auth-form-footer-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-form-footer-link {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-form-footer-link:hover {
+            text-decoration: underline;
+            color: #4f46e5;
+        }
+        
+        .auth-form-divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+        }
+        
+        .auth-form-divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e9ecef;
+        }
+        
+        .auth-form-divider-text {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .social-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-button {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-button:hover {
+            background: #f8f9fa;
+        }
+        
+        .social-button-icon {
+            font-size: 1.2rem;
+        }
+        
+        .social-button-icon.google {
+            color: #ea4335;
+        }
+        
+        .social-button-icon.facebook {
+            color: #1877f2;
+        }
+        
+        .social-button-icon.apple {
+            color: #000000;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+        }
+        
+        .password-field {
+            position: relative;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .alert-success {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border: 1px solid rgba(25, 135, 84, 0.2);
+        }
+        
+        /* Animation for page transition */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .auth-form-content {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-form {
+                padding: 2rem;
+            }
+        }
+
+        
+        
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-image">
+            <div class="auth-image-content">
+                <h1 class="auth-image-title">Content de vous revoir !</h1>
+                <p class="auth-image-text">Connectez-vous pour accéder à votre espace personnel et gérer vos projets de fin d'études.</p>
+                
+                <ul class="auth-image-features">
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Accédez à vos projets en cours</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Consultez votre calendrier</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Communiquez avec votre jury</span>
+                    </li>
+                    <li class="auth-image-feature">
+                        <div class="auth-image-feature-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Suivez votre progression</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="auth-image-shapes">
+                <div class="auth-image-shape auth-image-shape-1"></div>
+                <div class="auth-image-shape auth-image-shape-2"></div>
+                <div class="auth-image-shape auth-image-shape-3"></div>
+            </div>
+        </div>
+        
+        <div class="auth-form">
+            <div class="auth-form-header">
+                <div class="auth-form-logo">P</div>
+                <h2 class="auth-form-title">Connexion</h2>
+                <p class="auth-form-subtitle">Entrez vos identifiants pour accéder à votre compte</p>
+            </div>
+            
+            <div class="auth-form-content">
+                <!-- Alert for errors -->
+                <div class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span class="alert-message">Message d'erreur</span>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Adresse email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Entrez votre adresse email" required>
+                    </div>
+                    
+                    <div class="form-group password-field">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe" required>
+                        <span class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Se souvenir de moi
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                    </button>
+                    
+                    <div class="auth-form-divider">
+                        <div class="auth-form-divider-line"></div>
+                        <div class="auth-form-divider-text">ou connectez-vous avec</div>
+                        <div class="auth-form-divider-line"></div>
+                    </div>
+                    
+                    <div class="social-buttons">
+                        <button class="social-button">
+                            <i class="fab fa-google social-button-icon google"></i>
+                        </button>
+                        <button class="social-button">
+                            <i class="fab fa-facebook-f social-button-icon facebook"></i>
+                        </button>
+                        <button class="social-button">
+                            <i class="fab fa-apple social-button-icon apple"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="auth-form-footer">
+                    <p class="auth-form-footer-text">
+                        Vous n'avez pas de compte ? <a href="register.html" class="auth-form-footer-link" id="registerLink">Inscrivez-vous</a>
+                    </p>
+                    <p class="auth-form-footer-text">
+                        <a href="forgot-password.html" class="auth-form-footer-link">Mot de passe oublié ?</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-toggle">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-title">Assistant PFE</div>
+                <div class="chatbot-controls">
+                    <div class="chatbot-minimize"><i class="fas fa-minus"></i></div>
+                    <div class="chatbot-close"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Bonjour ! Je suis l'assistant IA de la plateforme PFE. Comment puis-je vous aider avec votre connexion ?</p>
+                    </div>
+                    <div class="message-time">Maintenant</div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions">
+                <div class="suggestion-chip">Problème de connexion ?</div>
+                <div class="suggestion-chip">Mot de passe oublié ?</div>
+                <div class="suggestion-chip">Créer un nouveau compte</div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <div class="action-button voice-input"><i class="fas fa-microphone"></i></div>
+                    <div class="action-button send-message"><i class="fas fa-paper-plane"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+
+                    // Fade in when page loads
+        document.body.style.opacity = '0';
+        document.body.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            document.body.style.opacity = '1';
+            document.body.style.transform = 'translateY(0)';
+        }, 50);
+        
+            // Password Toggle
+            const passwordToggles = document.querySelectorAll('.password-toggle');
+          
+            // Form Validation
+            const loginForm = document.getElementById('loginForm');
+            const alertBox = document.querySelector('.alert');
+            const alertMessage = document.querySelector('.alert-message');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Reset alert
+                alertBox.style.display = 'none';
+                
+                // Basic validation
+                if (!email || !password) {
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Veuillez remplir tous les champs.';
+                    return;
+                }
+                
+                // Check for admin credentials (simulation)
+                if (email === 'admin@exemple.com' && password === 'admin') {
+                    // Show success message
+                    alertBox.className = 'alert alert-success';
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Connexion réussie ! Redirection vers le tableau de bord...';
+                    
+                    // Redirect after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = '../admin/dashboard.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // Check for department head credentials (simulation)
+                if (email === 'head@exemple.com' && password === 'head') {
+                    // Show success message
+                    alertBox.className = 'alert alert-success';
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Connexion réussie ! Redirection vers le tableau de bord...';
+                    
+                    // Redirect after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = '../department/dashboard.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // Check for student credentials (simulation)
+                if (email === 'etudiant@exemple.com' && password === 'etudiant') {
+                    // Show success message
+                    alertBox.className = 'alert alert-success';
+                    alertBox.style.display = 'block';
+                    alertMessage.textContent = 'Connexion réussie ! Redirection vers votre espace...';
+                    
+                    // Redirect after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = '../student/dashboard.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // If credentials don't match, show error
+                alertBox.style.display = 'block';
+                alertMessage.textContent = 'Email ou mot de passe incorrect. Veuillez réessayer.';
+            });
+            
+            // Smooth transition to register page
+            const registerLink = document.getElementById('registerLink');
+            registerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Add fade-out animation to body
+                document.body.style.opacity = '0';
+                document.body.style.transform = 'translateY(20px)';
+                
+                // Navigate after animation completes
+                setTimeout(() => {
+                    window.location.href = this.getAttribute('href');
+                }, 500);
+            });
+            
+            // Add the same transition for the register link in the signup page
+            if (window.location.pathname.includes('register.html')) {
+                const loginLink = document.querySelector('a[href="login.html"]');
+                if (loginLink) {
+                    loginLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.body.style.opacity = '0';
+                        document.body.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            window.location.href = this.getAttribute('href');
+                        }, 500);
+                    });
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>

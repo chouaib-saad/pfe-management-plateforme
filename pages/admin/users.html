@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs - PFE Platform</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/buttons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .user-table th, .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .user-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+        
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .user-table tr:hover {
+            background-color: var(--bg-hover);
+        }
+        
+        .user-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .user-status.active {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+        
+        .user-status.inactive {
+            background-color: rgba(255, 69, 58, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .user-status.pending {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .user-action {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .user-action:hover {
+            background-color: var(--bg-quaternary);
+        }
+        
+        .user-action.edit:hover {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-blue);
+        }
+        
+        .user-action.delete:hover {
+            background-color: rgba(255, 69, 58, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .user-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .user-filter {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-filter label {
+            margin-right: 0.5rem;
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .user-filter select {
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .user-filter select:focus {
+            border-color: var(--primary-blue);
+        }
+        
+        .user-actions-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        
+        .pagination-item {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pagination-item:hover, .pagination-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 1rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link active">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="users.html" class="sidebar-link">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Utilisateurs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="departments.html" class="sidebar-link">
+                    <i class="fas fa-building sidebar-icon"></i>
+                    <span class="sidebar-text">Départements</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="InputContainer">
+                  <input type="text" name="text" class="input" id="input" placeholder="Rechercher...">
+                  
+                  <label for="input" class="labelforsearch">
+                    <svg viewBox="0 0 512 512" class="searchIcon"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
+                  </label>
+                  <div class="border"></div>
+                
+                  <button class="micButton"><svg viewBox="0 0 384 512" class="micIcon"><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"></path></svg>
+                  </button>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="header-notification-count">3</span>
+                </div>
+                
+                <div class="header-user">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin" class="header-user-avatar">
+                    <div class="header-user-info">
+                        <div class="header-user-name">Admin</div>
+                        <div class="header-user-role">Administrateur</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">Gestion des Utilisateurs</h1>
+                <div class="content-breadcrumb">
+                    <a href="dashboard.html">Tableau de bord</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Utilisateurs</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="user-actions-top">
+                        <div class="user-filters">
+                            <div class="user-filter">
+                                <label for="roleFilter">Rôle:</label>
+                                <select id="roleFilter">
+                                    <option value="all">Tous</option>
+                                    <option value="admin">Administrateur</option>
+                                    <option value="head">Chef de département</option>
+                                    <option value="teacher">Enseignant</option>
+                                    <option value="student">Étudiant</option>
+                                </select>
+                            </div>
+                            
+                            <div class="user-filter">
+                                <label for="statusFilter">Statut:</label>
+                                <select id="statusFilter">
+                                    <option value="all">Tous</option>
+                                    <option value="active">Actif</option>
+                                    <option value="inactive">Inactif</option>
+                                    <option value="pending">En attente</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="user-actions-buttons">
+                            <button class="btn btn-primary" id="addUserBtn">
+                                <i class="fas fa-plus mr-2"></i>Ajouter un utilisateur
+                            </button>
+                            
+                            <button class="btn btn-outline" id="refreshBtn">
+                                <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Rôle</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mohamed Karim</td>
+                                    <td>m.karim@exemple.com</td>
+                                    <td>Enseignant</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="1">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="1">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nadia Alaoui</td>
+                                    <td>n.alaoui@exemple.com</td>
+                                    <td>Chef de département</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="2">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="2">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ahmed Benali</td>
+                                    <td>a.benali@exemple.com</td>
+                                    <td>Étudiant</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="3">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="3">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Fatima Zahra</td>
+                                    <td>f.zahra@exemple.com</td>
+                                    <td>Étudiant</td>
+                                    <td><span class="user-status inactive">Inactif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="4">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="4">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Kamal Hassan</td>
+                                    <td>k.hassan@exemple.com</td>
+                                    <td>Enseignant</td>
+                                    <td><span class="user-status pending">En attente</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="5">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="5">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Salma Bennani</td>
+                                    <td>s.bennani@exemple.com</td>
+                                    <td>Étudiant</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="6">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="6">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Omar Tazi</td>
+                                    <td>o.tazi@exemple.com</td>
+                                    <td>Enseignant</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="7">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="7">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Youssef Amrani</td>
+                                    <td>y.amrani@exemple.com</td>
+                                    <td>Étudiant</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="8">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="8">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Laila Mansouri</td>
+                                    <td>l.mansouri@exemple.com</td>
+                                    <td>Chef de département</td>
+                                    <td><span class="user-status active">Actif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="9">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="9">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Hassan Alami</td>
+                                    <td>h.alami@exemple.com</td>
+                                    <td>Enseignant</td>
+                                    <td><span class="user-status inactive">Inactif</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <div class="user-action edit" data-id="10">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div class="user-action delete" data-id="10">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <div class="pagination-item">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                        <div class="pagination-item active">1</div>
+                        <div class="pagination-item">2</div>
+                        <div class="pagination-item">3</div>
+                        <div class="pagination-item">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Add/Edit User Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter un utilisateur</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId" value="">
+                    
+                    <div class="form-group">
+                        <label for="userName">Nom complet</label>
+                        <input type="text" id="userName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userEmail">Email</label>
+                        <input type="email" id="userEmail" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userRole">Rôle</label>
+                        <select id="userRole" class="form-control" required>
+                            <option value="">Sélectionner un rôle</option>
+                            <option value="admin">Administrateur</option>
+                            <option value="head">Chef de département</option>
+                            <option value="teacher">Enseignant</option>
+                            <option value="student">Étudiant</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userStatus">Statut</label>
+                        <select id="userStatus" class="form-control" required>
+                            <option value="">Sélectionner un statut</option>
+                            <option value="active">Actif</option>
+                            <option value="inactive">Inactif</option>
+                            <option value="pending">En attente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userPassword">Mot de passe</label>
+                        <input type="password" id="userPassword" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userPasswordConfirm">Confirmer le mot de passe</label>
+                        <input type="password" id="userPasswordConfirm" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelBtn">Annuler</button>
+                <button class="btn btn-primary" id="saveUserBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmer la suppression</h3>
+                <button class="modal-close" id="deleteModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+                <input type="hidden" id="deleteUserId" value="">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelDeleteBtn">Annuler</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot mr-2"></i>
+                Assistant PFE
+            </div>
+            <button class="chatbot-close" id="chatbotClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="chatbot-message bot">
+                Bonjour ! Je suis l'assistant virtuel de la plateforme PFE. Comment puis-je vous aider aujourd'hui ?
+                
+                <div class="chatbot-suggestions">
+                    <div class="chatbot-suggestion">Comment ajouter un utilisateur ?</div>
+                    <div class="chatbot-suggestion">Comment modifier un utilisateur ?</div>
+                    <div class="chatbot-suggestion">Comment supprimer un utilisateur ?</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" placeholder="Tapez votre message..." id="chatbotInput">
+                <button class="chatbot-send" id="chatbotSend">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+        
+        // User Modal
+        const userModal = document.getElementById('userModal');
+        const modalClose = document.getElementById('modalClose');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveUserBtn = document.getElementById('saveUserBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const userForm = document.getElementById('userForm');
+        const userId = document.getElementById('userId');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const userRole = document.getElementById('userRole');
+        const userStatus = document.getElementById('userStatus');
+        const userPassword = document.getElementById('userPassword');
+        const userPasswordConfirm = document.getElementById('userPasswordConfirm');
+        
+        // Edit User
+        const editButtons = document.querySelectorAll('.user-action.edit');
+        
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                modalTitle.textContent = 'Modifier un utilisateur';
+                userId.value = id;
+                
+                // Get user data (in a real app, this would be an API call)
+                const row = button.closest('tr');
+                const name = row.cells[0].textContent;
+                const email = row.cells[1].textContent;
+                const role = row.cells[2].textContent;
+                const status = row.cells[3].querySelector('.user-status').textContent;
+                
+                userName.value = name;
+                userEmail.value = email;
+                
+                // Set role
+                if (role === 'Administrateur') {
+                    userRole.value = 'admin';
+                } else if (role === 'Chef de département') {
+                    userRole.value = 'head';
+                } else if (role === 'Enseignant') {
+                    userRole.value = 'teacher';
+                } else if (role === 'Étudiant') {
+                    userRole.value = 'student';
+                }
+                
+                // Set status
+                if (status === 'Actif') {
+                    userStatus.value = 'active';
+                } else if (status === 'Inactif') {
+                    userStatus.value = 'inactive';
+                } else if (status === 'En attente') {
+                    userStatus.value = 'pending';
+                }
+                
+                // Password fields are not required for edit
+                userPassword.removeAttribute('required');
+                userPasswordConfirm.removeAttribute('required');
+                
+                userModal.classList.add('active');
+            });
+        });
+        
+        // Add User
+        addUserBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Ajouter un utilisateur';
+            userId.value = '';
+            userForm.reset();
+            
+            // Password fields are required for add
+            userPassword.setAttribute('required', '');
+            userPasswordConfirm.setAttribute('required', '');
+            
+            userModal.classList.add('active');
+        });
+        
+        // Close Modal
+        modalClose.addEventListener('click', () => {
+            userModal.classList.remove('active');
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            userModal.classList.remove('active');
+        });
+        
+        // Save User
+        saveUserBtn.addEventListener('click', () => {
+            // Validate form
+            if (!userForm.checkValidity()) {
+                userForm.reportValidity();
+                return;
+            }
+            
+            // Validate password match
+            if (userPassword.value !== userPasswordConfirm.value) {
+                alert('Les mots de passe ne correspondent pas.');
+                return;
+            }
+            
+            // In a real app, this would be an API call
+            if (userId.value) {
+                // Update existing user
+                const row = document.querySelector(`.user-action.edit[data-id="${userId.value}"]`).closest('tr');
+                
+                row.cells[0].textContent = userName.value;
+                row.cells[1].textContent = userEmail.value;
+                
+                // Set role text
+                if (userRole.value === 'admin') {
+                    row.cells[2].textContent = 'Administrateur';
+                } else if (userRole.value === 'head') {
+                    row.cells[2].textContent = 'Chef de département';
+                } else if (userRole.value === 'teacher') {
+                    row.cells[2].textContent = 'Enseignant';
+                } else if (userRole.value === 'student') {
+                    row.cells[2].textContent = 'Étudiant';
+                }
+                
+                // Set status
+                const statusSpan = row.cells[3].querySelector('.user-status');
+                statusSpan.className = 'user-status';
+                
+                if (userStatus.value === 'active') {
+                    statusSpan.textContent = 'Actif';
+                    statusSpan.classList.add('active');
+                } else if (userStatus.value === 'inactive') {
+                    statusSpan.textContent = 'Inactif';
+                    statusSpan.classList.add('inactive');
+                } else if (userStatus.value === 'pending') {
+                    statusSpan.textContent = 'En attente';
+                    statusSpan.classList.add('pending');
+                }
+                
+                alert('Utilisateur modifié avec succès !');
+            } else {
+                // Add new user
+                const tbody = document.querySelector('.user-table tbody');
+                const newRow = document.createElement('tr');
+                
+                // Create cells
+                const nameCell = document.createElement('td');
+                nameCell.textContent = userName.value;
+                
+                const emailCell = document.createElement('td');
+                emailCell.textContent = userEmail.value;
+                
+                const roleCell = document.createElement('td');
+                if (userRole.value === 'admin') {
+                    roleCell.textContent = 'Administrateur';
+                } else if (userRole.value === 'head') {
+                    roleCell.textContent = 'Chef de département';
+                } else if (userRole.value === 'teacher') {
+                    roleCell.textContent = 'Enseignant';
+                } else if (userRole.value === 'student') {
+                    roleCell.textContent = 'Étudiant';
+                }
+                
+                const statusCell = document.createElement('td');
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'user-status';
+                
+                if (userStatus.value === 'active') {
+                    statusSpan.textContent = 'Actif';
+                    statusSpan.classList.add('active');
+                } else if (userStatus.value === 'inactive') {
+                    statusSpan.textContent = 'Inactif';
+                    statusSpan.classList.add('inactive');
+                } else if (userStatus.value === 'pending') {
+                    statusSpan.textContent = 'En attente';
+                    statusSpan.classList.add('pending');
+                }
+                
+                statusCell.appendChild(statusSpan);
+                
+                const actionsCell = document.createElement('td');
+                actionsCell.innerHTML = `
+                    <div class="user-actions">
+                        <div class="user-action edit" data-id="11">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="user-action delete" data-id="11">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                    </div>
+                `;
+                
+                // Append cells to row
+                newRow.appendChild(nameCell);
+                newRow.appendChild(emailCell);
+                newRow.appendChild(roleCell);
+                newRow.appendChild(statusCell);
+                newRow.appendChild(actionsCell);
+                
+                // Append row to table
+                tbody.appendChild(newRow);
+                
+                // Add event listeners to new buttons
+                const newEditButton = actionsCell.querySelector('.user-action.edit');
+                const newDeleteButton = actionsCell.querySelector('.user-action.delete');
+                
+                newEditButton.addEventListener('click', () => {
+                    const id = newEditButton.getAttribute('data-id');
+                    modalTitle.textContent = 'Modifier un utilisateur';
+                    userId.value = id;
+                    
+                    // Get user data
+                    const row = newEditButton.closest('tr');
+                    const name = row.cells[0].textContent;
+                    const email = row.cells[1].textContent;
+                    const role = row.cells[2].textContent;
+                    const status = row.cells[3].querySelector('.user-status').textContent;
+                    
+                    userName.value = name;
+                    userEmail.value = email;
+                    
+                    // Set role
+                    if (role === 'Administrateur') {
+                        userRole.value = 'admin';
+                    } else if (role === 'Chef de département') {
+                        userRole.value = 'head';
+                    } else if (role === 'Enseignant') {
+                        userRole.value = 'teacher';
+                    } else if (role === 'Étudiant') {
+                        userRole.value = 'student';
+                    }
+                    
+                    // Set status
+                    if (status === 'Actif') {
+                        userStatus.value = 'active';
+                    } else if (status === 'Inactif') {
+                        userStatus.value = 'inactive';
+                    } else if (status === 'En attente') {
+                        userStatus.value = 'pending';
+                    }
+                    
+                    // Password fields are not required for edit
+                    userPassword.removeAttribute('required');
+                    userPasswordConfirm.removeAttribute('required');
+                    
+                    userModal.classList.add('active');
+                });
+                
+                newDeleteButton.addEventListener('click', () => {
+                    const id = newDeleteButton.getAttribute('data-id');
+                    deleteUserId.value = id;
+                    deleteModal.classList.add('active');
+                });
+                
+                alert('Utilisateur ajouté avec succès !');
+            }
+            
+            userModal.classList.remove('active');
+        });
+        
+        // Delete User
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteModalClose = document.getElementById('deleteModalClose');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const deleteUserId = document.getElementById('deleteUserId');
+        const deleteButtons = document.querySelectorAll('.user-action.delete');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                deleteUserId.value = id;
+                deleteModal.classList.add('active');
+            });
+        });
+        
+        deleteModalClose.addEventListener('click', () => {
+            deleteModal.classList.remove('active');
+        });
+        
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.classList.remove('active');
+        });
+        
+        confirmDeleteBtn.addEventListener('click', () => {
+            // In a real app, this would be an API call
+            const row = document.querySelector(`.user-action.delete[data-id="${deleteUserId.value}"]`).closest('tr');
+            row.remove();
+            
+            deleteModal.classList.remove('active');
+            alert('Utilisateur supprimé avec succès !');
+        });
+        
+        // Refresh Button
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        refreshBtn.addEventListener('click', () => {
+            // In a real app, this would refresh data from the server
+            alert('Données actualisées !');
+        });
+        
+        // Filters
+        const roleFilter = document.getElementById('roleFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        
+        roleFilter.addEventListener('change', filterUsers);
+        statusFilter.addEventListener('change', filterUsers);
+        
+        function filterUsers() {
+            const roleValue = roleFilter.value;
+            const statusValue = statusFilter.value;
+            
+            const rows = document.querySelectorAll('.user-table tbody tr');
+            
+            rows.forEach(row => {
+                let showRow = true;
+                
+                // Filter by role
+                if (roleValue !== 'all') {
+                    const roleText = row.cells[2].textContent;
+                    
+                    if (
+                        (roleValue === 'admin' && roleText !== 'Administrateur') ||
+                        (roleValue === 'head' && roleText !== 'Chef de département') ||
+                        (roleValue === 'teacher' && roleText !== 'Enseignant') ||
+                        (roleValue === 'student' && roleText !== 'Étudiant')
+                    ) {
+                        showRow = false;
+                    }
+                }
+                
+                // Filter by status
+                if (statusValue !== 'all' && showRow) {
+                    const statusText = row.cells[3].querySelector('.user-status').textContent;
+                    
+                    if (
+                        (statusValue === 'active' && statusText !== 'Actif') ||
+                        (statusValue === 'inactive' && statusText !== 'Inactif') ||
+                        (statusValue === 'pending' && statusText !== 'En attente')
+                    ) {
+                        showRow = false;
+                    }
+                }
+                
+                // Show or hide row
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+        
+        // Pagination
+        const paginationItems = document.querySelectorAll('.pagination-item');
+        
+        paginationItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                paginationItems.forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // In a real app, this would load the corresponding page
+            });
+        });
+        
+        // Chatbot
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotBody = document.getElementById('chatbotBody');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+        
+        // Toggle chatbot
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.classList.add('active');
+            chatbotToggle.style.display = 'none';
+        });
+        
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+            chatbotToggle.style.display = 'flex';
+        });
+        
+        // Send message
+        function sendMessage() {
+            const message = chatbotInput.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chatbot-message user';
+                userMessage.textContent = message;
+                chatbotBody.appendChild(userMessage);
+                
+                // Clear input
+                chatbotInput.value = '';
+                
+                // Scroll to bottom
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+                
+                // Simulate bot response after a short delay
+                setTimeout(() => {
+                    let botResponse;
+                    
+                    // Simple response logic based on keywords
+                    if (message.toLowerCase().includes('ajouter') || message.toLowerCase().includes('créer')) {
+                        botResponse = "Pour ajouter un utilisateur, cliquez sur le bouton 'Ajouter un utilisateur' en haut à droite de la page. Remplissez ensuite le formulaire avec les informations de l'utilisateur et cliquez sur 'Enregistrer'.";
+                    } else if (message.toLowerCase().includes('modifier') || message.toLowerCase().includes('éditer')) {
+                        botResponse = "Pour modifier un utilisateur, cliquez sur l'icône de crayon (éditer) dans la colonne 'Actions' de l'utilisateur que vous souhaitez modifier. Mettez à jour les informations dans le formulaire qui s'affiche, puis cliquez sur 'Enregistrer'.";
+                    } else if (message.toLowerCase().includes('supprimer') || message.toLowerCase().includes('effacer')) {
+                        botResponse = "Pour supprimer un utilisateur, cliquez sur l'icône de corbeille (supprimer) dans la colonne 'Actions' de l'utilisateur que vous souhaitez supprimer. Confirmez ensuite la suppression dans la boîte de dialogue qui s'affiche.";
+                    } else if (message.toLowerCase().includes('filtrer') || message.toLowerCase().includes('rechercher')) {
+                        botResponse = "Pour filtrer les utilisateurs, utilisez les menus déroulants 'Rôle' et 'Statut' en haut de la page. Vous pouvez également utiliser la barre de recherche pour trouver un utilisateur spécifique.";
+                    } else {
+                        botResponse = "Je ne suis pas sûr de comprendre votre question. Voici quelques sujets sur lesquels je peux vous aider :";
+                        
+                        // Add suggestions
+                        const suggestions = document.createElement('div');
+                        suggestions.className = 'chatbot-suggestions';
+                        
+                        const suggestion1 = document.createElement('div');
+                        suggestion1.className = 'chatbot-suggestion';
+                        suggestion1.textContent = "Comment ajouter un utilisateur ?";
+                        
+                        const suggestion2 = document.createElement('div');
+                        suggestion2.className = 'chatbot-suggestion';
+                        suggestion2.textContent = "Comment modifier un utilisateur ?";
+                        
+                        const suggestion3 = document.createElement('div');
+                        suggestion3.className = 'chatbot-suggestion';
+                        suggestion3.textContent = "Comment supprimer un utilisateur ?";
+                        
+                        suggestions.appendChild(suggestion1);
+                        suggestions.appendChild(suggestion2);
+                        suggestions.appendChild(suggestion3);
+                        
+                        // Add bot response
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'chatbot-message bot';
+                        botMessage.textContent = botResponse;
+                        botMessage.appendChild(suggestions);
+                        chatbotBody.appendChild(botMessage);
+                        
+                        // Add click event to suggestions
+                        const allSuggestions = document.querySelectorAll('.chatbot-suggestion');
+                        allSuggestions.forEach(suggestion => {
+                            suggestion.addEventListener('click', () => {
+                                chatbotInput.value = suggestion.textContent;
+                                sendMessage();
+                            });
+                        });
+                        
+                        return;
+                    }
+                    
+                    // Add bot response
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chatbot-message bot';
+                    botMessage.textContent = botResponse;
+                    chatbotBody.appendChild(botMessage);
+                    
+                    // Scroll to bottom
+                    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+                }, 1000);
+            }
+        }
+        
+        chatbotSend.addEventListener('click', sendMessage);
+        
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Add click event to initial suggestions
+        const initialSuggestions = document.querySelectorAll('.chatbot-suggestion');
+        initialSuggestions.forEach(suggestion => {
+            suggestion.addEventListener('click', () => {
+                chatbotInput.value = suggestion.textContent;
+                sendMessage();
+            });
+        });
+        
+        // Voice recognition for search
+        const micButton = document.querySelector('.micButton');
+        const searchInput = document.querySelector('.input');
+        
+        if (micButton && 'webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'fr-FR';
+            
+            micButton.addEventListener('click', () => {
+                recognition.start();
+                micButton.style.backgroundColor = 'rgb(255, 230, 230)';
+            });
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                searchInput.value = transcript;
+                micButton.style.backgroundColor = 'transparent';
+            };
+            
+            recognition.onend = () => {
+                micButton.style.backgroundColor = 'transparent';
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Jurys - PFE Platform</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        .jury-container {
+            padding: 2rem;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        
+        .jury-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .jury-title h1 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: 0.5rem;
+        }
+        
+        .jury-title p {
+            color: var(--text-secondary);
+        }
+        
+        .jury-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .jury-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .jury-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .jury-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .jury-card-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .jury-card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .jury-card-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .jury-card-subtitle {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            position: relative;
+        }
+        
+        .jury-card-body {
+            padding: 1.5rem;
+        }
+        
+        .jury-members {
+            margin-bottom: 1.5rem;
+        }
+        
+        .jury-member {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .jury-member:last-child {
+            border-bottom: none;
+        }
+        
+        .jury-member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-blue);
+        }
+        
+        .jury-member-info {
+            flex: 1;
+        }
+        
+        .jury-member-name {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .jury-member-role {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .jury-member-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .jury-card-footer {
+            padding: 1rem 1.5rem;
+            background-color: var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .jury-status {
+            display: flex;
+            align-items: center;
+            font-size: var(--font-size-sm);
+        }
+        
+        .jury-status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: var(--radius-full);
+            margin-right: 0.5rem;
+        }
+        
+        .jury-status-indicator.complete {
+            background-color: var(--success-color);
+        }
+        
+        .jury-status-indicator.incomplete {
+            background-color: var(--warning-color);
+        }
+        
+        .jury-status-indicator.pending {
+            background-color: var(--info-color);
+        }
+        
+        .jury-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .jury-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .jury-filter {
+            display: flex;
+            align-items: center;
+        }
+        
+        .jury-filter-label {
+            margin-right: 0.5rem;
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .jury-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .page-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .page-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .page-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        /* Prism effect for jury cards */
+        .jury-card.prism {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .jury-card.prism::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -75%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            transform: skewX(-25deg);
+            transition: all 0.75s;
+            z-index: 1;
+        }
+        
+        .jury-card.prism:hover::before {
+            left: 125%;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .jury-container {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .jury-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .jury-actions {
+                width: 100%;
+            }
+        }
+        
+        /* Add Jury Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Teacher selection */
+        .teacher-selection {
+            margin-top: 1.5rem;
+        }
+        
+        .teacher-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .teacher-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .teacher-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .teacher-item.selected {
+            background-color: rgba(var(--primary-blue-rgb), 0.1);
+            border: 1px solid var(--primary-blue);
+        }
+        
+        .teacher-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-blue);
+        }
+        
+        .teacher-info {
+            flex: 1;
+        }
+        
+        .teacher-name {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .teacher-department {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .teacher-checkbox {
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="jury-management.html" class="sidebar-link active">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des Jurys</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="calendar.html" class="sidebar-link">
+                    <i class="fas fa-calendar-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Calendrier</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="excel-import.html" class="sidebar-link">
+                    <i class="fas fa-file-excel sidebar-icon"></i>
+                    <span class="sidebar-text">Import Excel</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="statistics.html" class="sidebar-link">
+                    <i class="fas fa-chart-bar sidebar-icon"></i>
+                    <span class="sidebar-text">Statistiques</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="jury-container">
+        <div class="jury-header">
+            <div class="jury-title">
+                <h1 class="fade-in">Gestion des Jurys</h1>
+                <p class="fade-in stagger-1">Assignez et gérez les jurys pour les présentations de PFE</p>
+            </div>
+            
+            <div class="jury-actions">
+                <button class="btn btn-primary" id="addJuryBtn">
+                    <i class="fas fa-plus mr-2"></i>Créer un Jury
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-magic mr-2"></i>Assignation Automatique
+                </button>
+            </div>
+        </div>
+        
+        <div class="jury-filters fade-in">
+            <div class="jury-filter">
+                <span class="jury-filter-label">Département:</span>
+                <select class="form-select form-select-sm">
+                    <option value="all">Tous</option>
+                    <option value="info">Informatique</option>
+                    <option value="elec">Électronique</option>
+                    <option value="meca">Mécanique</option>
+                </select>
+            </div>
+            
+            <div class="jury-filter">
+                <span class="jury-filter-label">Statut:</span>
+                <select class="form-select form-select-sm">
+                    <option value="all">Tous</option>
+                    <option value="complete">Complet</option>
+                    <option value="incomplete">Incomplet</option>
+                    <option value="pending">En attente</option>
+                </select>
+            </div>
+            
+            <div class="jury-filter">
+                <span class="jury-filter-label">Date:</span>
+                <select class="form-select form-select-sm">
+                    <option value="all">Toutes</option>
+                    <option value="today">Aujourd'hui</option>
+                    <option value="tomorrow">Demain</option>
+                    <option value="week">Cette semaine</option>
+                </select>
+            </div>
+            
+            <div class="jury-filter ml-auto">
+                <div class="search-container">
+                    <input type="text" class="form-control" placeholder="Rechercher...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jury-grid">
+            <!-- Jury Card 1 -->
+            <div class="jury-card prism fade-in-up">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Développement d'une application mobile</h3>
+                    <p class="jury-card-subtitle">19 Avril 2025 - 08:30</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Mohamed Karim</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Nadia Alaoui</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Omar Tazi</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Ahmed Benali
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator complete"></div>
+                        <span>Complet</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jury Card 2 -->
+            <div class="jury-card prism fade-in-up stagger-1">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Système embarqué pour la domotique</h3>
+                    <p class="jury-card-subtitle">19 Avril 2025 - 10:10</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Nadia Alaoui</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Kamal Hassan</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Ajouter un membre</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Fatima Zahra
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator incomplete"></div>
+                        <span>Incomplet</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jury Card 3 -->
+            <div class="jury-card prism fade-in-up stagger-2">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Intelligence artificielle pour la reconnaissance d'images</h3>
+                    <p class="jury-card-subtitle">19 Avril 2025 - 13:50</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Kamal Hassan</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Mohamed Karim</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Hassan Bennani</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Youssef Amrani
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator complete"></div>
+                        <span>Complet</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jury Card 4 -->
+            <div class="jury-card prism fade-in-up stagger-3">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Système de gestion de base de données distribuée</h3>
+                    <p class="jury-card-subtitle">20 Avril 2025 - 08:30</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Omar Tazi</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Ajouter un président</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Ajouter un membre</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Salma Bennani
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator pending"></div>
+                        <span>En attente</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jury Card 5 -->
+            <div class="jury-card prism fade-in-up stagger-4">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Développement d'un système de recommandation</h3>
+                    <p class="jury-card-subtitle">20 Avril 2025 - 10:10</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Hassan Bennani</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Omar Tazi</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Nadia Alaoui</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Karim Mansouri
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator complete"></div>
+                        <span>Complet</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jury Card 6 -->
+            <div class="jury-card prism fade-in-up stagger-5">
+                <div class="jury-card-header">
+                    <h3 class="jury-card-title">Application web pour la gestion des stocks</h3>
+                    <p class="jury-card-subtitle">20 Avril 2025 - 11:50</p>
+                </div>
+                
+                <div class="jury-card-body">
+                    <div class="jury-members">
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Mohamed Karim</div>
+                                <div class="jury-member-role">Encadreur</div>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Ajouter un président</div>
+                                <div class="jury-member-role">Président</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="jury-member">
+                            <div class="jury-member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="jury-member-info">
+                                <div class="jury-member-name">Dr. Kamal Hassan</div>
+                                <div class="jury-member-role">Membre</div>
+                            </div>
+                            <div class="jury-member-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-secondary">
+                        <i class="fas fa-user mr-1"></i> Leila Chakir
+                    </div>
+                </div>
+                
+                <div class="jury-card-footer">
+                    <div class="jury-status">
+                        <div class="jury-status-indicator incomplete"></div>
+                        <span>Incomplet</span>
+                    </div>
+                    
+                    <div class="jury-card-actions">
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon-only btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jury-pagination">
+            <div class="page-item">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Jury Modal -->
+    <div class="modal-backdrop" id="addJuryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Créer un nouveau jury</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addJuryForm">
+                    <div class="form-group">
+                        <label for="juryPfe" class="form-label">Projet PFE</label>
+                        <select id="juryPfe" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un projet</option>
+                            <option value="1">Développement d'une application mobile</option>
+                            <option value="2">Système embarqué pour la domotique</option>
+                            <option value="3">Intelligence artificielle pour la reconnaissance d'images</option>
+                            <option value="4">Système de gestion de base de données distribuée</option>
+                            <option value="5">Développement d'un système de recommandation</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="juryDate" class="form-label">Date de présentation</label>
+                        <input type="date" id="juryDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="juryTime" class="form-label">Heure de présentation</label>
+                        <select id="juryTime" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner une session</option>
+                            <option value="s1">S1: 08H30 - 10H00</option>
+                            <option value="s2">S2: 10H10 - 11H40</option>
+                            <option value="s3">S3: 11H50 - 13H20</option>
+                            <option value="s4">S4: 13H50 - 15H20</option>
+                            <option value="s5">S5: 15H30 - 17H00</option>
+                            <option value="s6">S6: 17H10 - 18H40</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="juryRoom" class="form-label">Salle</label>
+                        <input type="text" id="juryRoom" class="form-control" placeholder="Numéro de salle" required>
+                    </div>
+                    
+                    <div class="teacher-selection">
+                        <label class="form-label">Sélectionner les membres du jury</label>
+                        <p class="text-sm text-secondary mb-2">Sélectionnez au moins 2 enseignants en plus de l'encadreur</p>
+                        
+                        <div class="teacher-list">
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Mohamed Karim</div>
+                                    <div class="teacher-department">Informatique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Nadia Alaoui</div>
+                                    <div class="teacher-department">Informatique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Kamal Hassan</div>
+                                    <div class="teacher-department">Électronique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Omar Tazi</div>
+                                    <div class="teacher-department">Informatique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Hassan Bennani</div>
+                                    <div class="teacher-department">Mécanique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            
+                            <div class="teacher-item">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">Dr. Samira Kadiri</div>
+                                    <div class="teacher-department">Électronique</div>
+                                </div>
+                                <div class="teacher-checkbox">
+                                    <input type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAddJury">Annuler</button>
+                <button class="btn btn-primary" id="submitAddJury">Créer</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const juryContainer = document.querySelector('.jury-container');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                juryContainer.classList.toggle('sidebar-collapsed');
+            });
+        }
+        
+        // Modal Controls
+        const addJuryBtn = document.getElementById('addJuryBtn');
+        const addJuryModal = document.getElementById('addJuryModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAddJury = document.getElementById('cancelAddJury');
+        const submitAddJury = document.getElementById('submitAddJury');
+        
+        if (addJuryBtn && addJuryModal) {
+            addJuryBtn.addEventListener('click', () => {
+                addJuryModal.classList.add('active');
+            });
+            
+            closeModal.addEventListener('click', () => {
+                addJuryModal.classList.remove('active');
+            });
+            
+            cancelAddJury.addEventListener('click', () => {
+                addJuryModal.classList.remove('active');
+            });
+            
+            submitAddJury.addEventListener('click', () => {
+                // In a real application, this would submit the form data
+                alert('Jury créé avec succès!');
+                addJuryModal.classList.remove('active');
+            });
+        }
+        
+        // Teacher Selection
+        const teacherItems = document.querySelectorAll('.teacher-item');
+        
+        teacherItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const checkbox = item.querySelector('.form-check-input');
+                checkbox.checked = !checkbox.checked;
+                
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        });
+        
+        // Pagination
+        const pageItems = document.querySelectorAll('.page-item');
+        
+        pageItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all page items
+                pageItems.forEach(pageItem => {
+                    pageItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked page item
+                item.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

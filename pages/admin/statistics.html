@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - Admin - Plateforme PFE</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/theme-toggle.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <img src="../../img/logo.png" alt="PFE Platform Logo" height="40">
+                <span class="ms-2 fw-bold text-primary">PFE Platform</span>
+                <span class="badge bg-danger ms-2">Admin</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="users.html">
+                            <i class="fas fa-users"></i> Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="departments.html">
+                            <i class="fas fa-building"></i> Départements
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="teachers.html">
+                            <i class="fas fa-chalkboard-teacher"></i> Enseignants
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pfe-management.html">
+                            <i class="fas fa-project-diagram"></i> Gestion PFE
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="statistics.html">
+                            <i class="fas fa-chart-bar"></i> Statistiques
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="settings.html">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user"></i> Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../auth/login.html"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-5 pt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-xl-2">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="#overview" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-chart-pie me-2"></i> Vue d'ensemble
+                            </a>
+                            <a href="#users" class="list-group-item list-group-item-action">
+                                <i class="fas fa-users me-2"></i> Utilisateurs
+                            </a>
+                            <a href="#departments" class="list-group-item list-group-item-action">
+                                <i class="fas fa-building me-2"></i> Départements
+                            </a>
+                            <a href="#projects" class="list-group-item list-group-item-action">
+                                <i class="fas fa-project-diagram me-2"></i> Projets
+                            </a>
+                            <a href="#teachers" class="list-group-item list-group-item-action">
+                                <i class="fas fa-chalkboard-teacher me-2"></i> Enseignants
+                            </a>
+                            <a href="#system" class="list-group-item list-group-item-action">
+                                <i class="fas fa-server me-2"></i> Système
+                            </a>
+                            <a href="#export" class="list-group-item list-group-item-action">
+                                <i class="fas fa-file-export me-2"></i> Exporter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9 col-xl-10">
+                <!-- Overview Section -->
+                <section id="overview">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Vue d'ensemble</h5>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Jour</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary active">Semaine</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Mois</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Année</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-primary text-white rounded p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h3 class="mb-0">1,254</h3>
+                                                <p class="mb-0">Utilisateurs</p>
+                                            </div>
+                                            <div class="stat-icon">
+                                                <i class="fas fa-users fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-light text-primary">+5.2% <i class="fas fa-arrow-up"></i></span>
+                                            <small class="text-white-50 ms-1">depuis la semaine dernière</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-success text-white rounded p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h3 class="mb-0">428</h3>
+                                                <p class="mb-0">Projets actifs</p>
+                                            </div>
+                                            <div class="stat-icon">
+                                                <i class="fas fa-project-diagram fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-light text-success">+12.7% <i class="fas fa-arrow-up"></i></span>
+                                            <small class="text-white-50 ms-1">depuis la semaine dernière</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-info text-white rounded p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h3 class="mb-0">87</h3>
+                                                <p class="mb-0">Soutenances</p>
+                                            </div>
+                                            <div class="stat-icon">
+                                                <i class="fas fa-calendar-check fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-light text-info">+3.8% <i class="fas fa-arrow-up"></i></span>
+                                            <small class="text-white-50 ms-1">depuis la semaine dernière</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-warning text-white rounded p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h3 class="mb-0">15</h3>
+                                                <p class="mb-0">Départements</p>
+                                            </div>
+                                            <div class="stat-icon">
+                                                <i class="fas fa-building fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-light text-warning">+0% <i class="fas fa-equals"></i></span>
+                                            <small class="text-white-50 ms-1">depuis la semaine dernière</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-3">Activité de la plateforme</h6>
+                                    <canvas id="activityChart" height="250"></canvas>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold mb-3">Répartition des projets</h6>
+                                    <canvas id="projectsChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Users Section -->
+                <section id="users">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Statistiques des utilisateurs</h5>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download me-1"></i> Exporter
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-3">Nouveaux utilisateurs</h6>
+                                    <canvas id="newUsersChart" height="250"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-3">Répartition par rôle</h6>
+                                    <canvas id="userRolesChart" height="250"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="fw-bold mb-3">Activité des utilisateurs</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Utilisateur</th>
+                                                <th>Rôle</th>
+                                                <th>Dernière connexion</th>
+                                                <th>Projets</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Ahmed Benali</td>
+                                                <td><span class="badge bg-danger">Admin</span></td>
+                                                <td>Aujourd'hui, 10:45</td>
+                                                <td>-</td>
+                                                <td>145</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sarra Mejri</td>
+                                                <td><span class="badge bg-primary">Chef Département</span></td>
+                                                <td>Aujourd'hui, 09:12</td>
+                                                <td>32</td>
+                                                <td>87</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Kamel Hamrouni</td>
+                                                <td><span class="badge bg-info">Enseignant</span></td>
+                                                <td>Hier, 15:30</td>
+                                                <td>8</td>
+                                                <td>42</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nabil Tabbane</td>
+                                                <td><span class="badge bg-info">Enseignant</span></td>
+                                                <td>Hier, 14:22</td>
+                                                <td>12</td>
+                                                <td>56</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Amira Lakhal</td>
+                                                <td><span class="badge bg-secondary">Étudiant</span></td>
+                                                <td>Aujourd'hui, 11:05</td>
+                                                <td>1</td>
+                                                <td>23</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                
+            
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container">
+            <div class="text-center">
+                <span class="text-muted">© 2025 PFE Platform. Tous droits réservés.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/ui-components.js"></script>
+    
+    <!-- Charts Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Activity Chart
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            const activityChart = new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                    datasets: [{
+                        label: 'Connexions',
+                        data: [65, 59, 80, 81, 56, 40, 70],
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }, {
+                        label: 'Actions',
+                        data: [28, 48, 40, 19, 86, 27, 90],
+                        borderColor: '#36b9cc',
+                        backgroundColor: 'rgba(54, 185, 204, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Projects Chart
+            const projectsCtx = document.getElementById('projectsChart').getContext('2d');
+            const projectsChart = new Chart(projectsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Informatique', 'Électronique', 'Mécanique', 'Génie Civil', 'Autres'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#e74a3b'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            
+            // New Users Chart
+            const newUsersCtx = document.getElementById('newUsersChart').getContext('2d');
+            const newUsersChart = new Chart(newUsersCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                    datasets: [{
+                        label: 'Nouveaux utilisateurs',
+                        data: [65, 59, 80, 81, 56, 40],
+                        backgroundColor: '#4e73df'
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+            // User Roles Chart
+            const userRolesCtx = document.getElementById('userRolesChart').getContext('2d');
+            const userRolesChart = new Chart(userRolesCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Étudiants', 'Enseignants', 'Chefs de département', 'Administrateurs'],
+                    datasets: [{
+                        data: [70, 20, 8, 2],
+                        backgroundColor: [
+                            '#6c757d',
+                            '#17a2b8',
+                            '#007bff',
+                            '#dc3545'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            
+            // Response Time Chart
+            const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+            const responseTimeChart = new Chart(responseTimeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Temps de réponse (ms)',
+                        data: [120, 110, 180, 270, 220, 150],
+                        borderColor: '#1cc88a',
+                        backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        });
+    </script>
+</body>
+</html>

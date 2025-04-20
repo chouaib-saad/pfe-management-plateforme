@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des PFE - Plateforme PFE</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/buttons.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo img {
+            height: 40px;
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1rem 0;
+        }
+        
+        .sidebar-menu-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem 0 0.5rem 1rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background-color: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table tr:hover td {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .badge-success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .badge-info {
+            background-color: var(--info-light);
+            color: var(--info-dark);
+        }
+        
+        .badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-full);
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+        }
+        
+        .avatar-sm {
+            width: 2rem;
+            height: 2rem;
+            font-size: var(--font-size-xs);
+        }
+        
+        .avatar-lg {
+            width: 3rem;
+            height: 3rem;
+            font-size: var(--font-size-md);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-name {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .user-email {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-icon:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .btn-icon-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .btn-icon-primary:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .btn-icon-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .btn-icon-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-icon-success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .btn-icon-success:hover {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-icon-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .btn-icon-warning:hover {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .form-check-label {
+            color: var(--text-secondary);
+        }
+        
+        .form-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination-item {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-item:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .pagination-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .pagination-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem 0.5rem;
+            }
+            
+            .sidebar-logo-text {
+                display: none;
+            }
+            
+            .sidebar-menu-item span {
+                display: none;
+            }
+            
+            .sidebar-menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .sidebar-menu-item i {
+                margin-right: 0;
+            }
+            
+            .sidebar-menu-title {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+        
+        /* Status colors */
+        .status-pending {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .status-scheduled {
+            background-color: var(--info-light);
+            color: var(--info-dark);
+        }
+        
+        .status-completed {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .status-cancelled {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        /* Bulk actions dropdown */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: 0.5rem;
+            min-width: 200px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Custom checkbox */
+        .custom-checkbox {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 0.5rem;
+        }
+        
+        .custom-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        /* Search bar */
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-xs);
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .tag i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Progress bar */
+        .progress {
+            height: 0.5rem;
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            border-radius: var(--radius-full);
+            transition: width 0.3s;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-description {
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span class="sidebar-logo-text">PFE Platform</span>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="sidebar-menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Tableau de bord</span>
+                </a>
+                
+                <a href="pfe-management.html" class="sidebar-menu-item active">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Gestion des PFE</span>
+                </a>
+                
+                <a href="excel-import.html" class="sidebar-menu-item">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Import Excel</span>
+                </a>
+                
+                <a href="jury-management.html" class="sidebar-menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Gestion des jurys</span>
+                </a>
+                
+                <a href="calendar.html" class="sidebar-menu-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendrier</span>
+                </a>
+                
+                <a href="statistics.html" class="sidebar-menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistiques</span>
+                </a>
+                
+                <a href="teachers.html" class="sidebar-menu-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Enseignants</span>
+                </a>
+                
+                <div class="sidebar-divider"></div>
+                
+                <a href="settings.html" class="sidebar-menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Paramètres</span>
+                </a>
+                
+                <a href="../auth/login.html" class="sidebar-menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des PFE</h1>
+                
+                <div class="page-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" id="bulkActionsToggle">
+                            <i class="fas fa-cog"></i>
+                            <span>Actions groupées</span>
+                        </button>
+                        
+                        <div class="dropdown-menu" id="bulkActionsMenu">
+                            <div class="dropdown-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Planifier les soutenances</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-users"></i>
+                                <span>Attribuer des jurys</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-file-export"></i>
+                                <span>Exporter en Excel</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Exporter en PDF</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-trash-alt"></i>
+                                <span>Supprimer</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="addPfeBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Ajouter un PFE</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Liste des projets</h2>
+                    
+                    <div class="card-actions">
+                        <div class="search-bar">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Rechercher un projet..." id="searchInput">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="all">Tous les projets</div>
+                    <div class="tab" data-tab="pending">En attente</div>
+                    <div class="tab" data-tab="scheduled">Planifiés</div>
+                    <div class="tab" data-tab="completed">Terminés</div>
+                </div>
+                
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <select class="form-select" id="supervisorFilter">
+                            <option value="">Tous les encadrants</option>
+                            <option value="1">Dr. Kamel Hamrouni</option>
+                            <option value="2">Dr. Sana Fakhfakh</option>
+                            <option value="3">Dr. Nabil Tabbane</option>
+                            <option value="4">Dr. Lamia Ben Amor</option>
+                            <option value="5">Dr. Faouzi Benzarti</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Tous les statuts</option>
+                            <option value="pending">En attente</option>
+                            <option value="scheduled">Planifié</option>
+                            <option value="completed">Terminé</option>
+                            <option value="cancelled">Annulé</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <select class="form-select" id="dateFilter">
+                            <option value="">Toutes les dates</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="tomorrow">Demain</option>
+                            <option value="this_week">Cette semaine</option>
+                            <option value="next_week">Semaine prochaine</option>
+                            <option value="this_month">Ce mois</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table" id="pfeTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="selectAll">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>ID</th>
+                                <th>Étudiant</th>
+                                <th>Titre du projet</th>
+                                <th>Encadrant</th>
+                                <th>Jury</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Row 1 -->
+                            <tr>
+                                <td>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>PFE-2025-001</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">MA</div>
+                                        <div>
+                                            <div class="user-name">Mohamed Amine</div>
+                                            <div class="user-email">mohamed.amine@etudiant.tn</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Développement d'une application mobile de suivi médical</td>
+                                <td>Dr. Kamel Hamrouni</td>
+                                <td>
+                                    <div class="tags">
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Sana Fakhfakh
+                                        </div>
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Nabil Tabbane
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>15/06/2025 (S2)</td>
+                                <td>
+                                    <span class="badge status-scheduled">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Planifié
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 2 -->
+                            <tr>
+                                <td>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>PFE-2025-002</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">FZ</div>
+                                        <div>
+                                            <div class="user-name">Fatima Zahra</div>
+                                            <div class="user-email">fatima.zahra@etudiant.tn</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Conception d'un système de reconnaissance faciale pour la sécurité</td>
+                                <td>Dr. Sana Fakhfakh</td>
+                                <td>
+                                    <div class="tags">
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Kamel Hamrouni
+                                        </div>
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Lamia Ben Amor
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>16/06/2025 (S3)</td>
+                                <td>
+                                    <span class="badge status-scheduled">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Planifié
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 3 -->
+                            <tr>
+                                <td>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>PFE-2025-003</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">YT</div>
+                                        <div>
+                                            <div class="user-name">Yassine Trabelsi</div>
+                                            <div class="user-email">yassine.trabelsi@etudiant.tn</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Implémentation d'un algorithme de détection d'anomalies dans les réseaux</td>
+                                <td>Dr. Nabil Tabbane</td>
+                                <td>
+                                    <div class="tags">
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Faouzi Benzarti
+                                        </div>
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Sana Fakhfakh
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge status-pending">
+                                        <i class="fas fa-clock"></i>
+                                        En attente
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 4 -->
+                            <tr>
+                                <td>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>PFE-2025-004</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">AB</div>
+                                        <div>
+                                            <div class="user-name">Ahmed Ben Ali</div>
+                                            <div class="user-email">ahmed.benali@etudiant.tn</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Création d'une plateforme e-learning avec intelligence artificielle</td>
+                                <td>Dr. Lamia Ben Amor</td>
+                                <td>
+                                    <div class="tags">
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Kamel Hamrouni
+                                        </div>
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Nabil Tabbane
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>10/06/2025 (S4)</td>
+                                <td>
+                                    <span class="badge status-completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        Terminé
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 5 -->
+                            <tr>
+                                <td>
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>PFE-2025-005</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">SM</div>
+                                        <div>
+                                            <div class="user-name">Salma Mejri</div>
+                                            <div class="user-email">salma.mejri@etudiant.tn</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Développement d'un chatbot pour le service client</td>
+                                <td>Dr. Faouzi Benzarti</td>
+                                <td>
+                                    <div class="tags">
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Lamia Ben Amor
+                                        </div>
+                                        <div class="tag">
+                                            <i class="fas fa-user"></i>
+                                            Dr. Sana Fakhfakh
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge status-cancelled">
+                                        <i class="fas fa-times-circle"></i>
+                                        Annulé
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <div class="pagination-item disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">2</div>
+                    <div class="pagination-item">3</div>
+                    <div class="pagination-item">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit PFE Modal -->
+    <div class="modal" id="pfeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter un PFE</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="pfeForm">
+                    <div class="form-group">
+                        <label for="projectId" class="form-label">ID du projet</label>
+                        <input type="text" id="projectId" class="form-control" placeholder="Ex: PFE-2025-XXX" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="studentName" class="form-label">Nom de l'étudiant</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Nom complet de l'étudiant" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="studentEmail" class="form-label">Email de l'étudiant</label>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="email@etudiant.tn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectTitle" class="form-label">Titre du projet</label>
+                        <input type="text" id="projectTitle" class="form-control" placeholder="Titre du PFE" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supervisor" class="form-label">Encadrant</label>
+                        <select id="supervisor" class="form-select" required>
+                            <option value="">Sélectionner un encadrant</option>
+                            <option value="1">Dr. Kamel Hamrouni</option>
+                            <option value="2">Dr. Sana Fakhfakh</option>
+                            <option value="3">Dr. Nabil Tabbane</option>
+                            <option value="4">Dr. Lamia Ben Amor</option>
+                            <option value="5">Dr. Faouzi Benzarti</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="juryPresident" class="form-label">Président du jury</label>
+                        <select id="juryPresident" class="form-select">
+                            <option value="">Sélectionner un président</option>
+                            <option value="1">Dr. Kamel Hamrouni</option>
+                            <option value="2">Dr. Sana Fakhfakh</option>
+                            <option value="3">Dr. Nabil Tabbane</option>
+                            <option value="4">Dr. Lamia Ben Amor</option>
+                            <option value="5">Dr. Faouzi Benzarti</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="juryRapporteur" class="form-label">Rapporteur</label>
+                        <select id="juryRapporteur" class="form-select">
+                            <option value="">Sélectionner un rapporteur</option>
+                            <option value="1">Dr. Kamel Hamrouni</option>
+                            <option value="2">Dr. Sana Fakhfakh</option>
+                            <option value="3">Dr. Nabil Tabbane</option>
+                            <option value="4">Dr. Lamia Ben Amor</option>
+                            <option value="5">Dr. Faouzi Benzarti</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="presentationDate" class="form-label">Date de soutenance</label>
+                        <input type="date" id="presentationDate" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="presentationSession" class="form-label">Session</label>
+                        <select id="presentationSession" class="form-select">
+                            <option value="">Sélectionner une session</option>
+                            <option value="S1">S1 (08H30 - 10H00)</option>
+                            <option value="S2">S2 (10H10 - 11H40)</option>
+                            <option value="S3">S3 (11H50 - 13H20)</option>
+                            <option value="S4">S4 (13H50 - 15H20)</option>
+                            <option value="S5">S5 (15H30 - 17H00)</option>
+                            <option value="S6">S6 (17H10 - 18H40)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="room" class="form-label">Salle</label>
+                        <select id="room" class="form-select">
+                            <option value="">Sélectionner une salle</option>
+                            <option value="A101">A101</option>
+                            <option value="A102">A102</option>
+                            <option value="A103">A103</option>
+                            <option value="B201">B201</option>
+                            <option value="B202">B202</option>
+                            <option value="B203">B203</option>
+                            <option value="C301">C301</option>
+                            <option value="C302">C302</option>
+                            <option value="C303">C303</option>
+                            <option value="D401">D401</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status" class="form-label">Statut</label>
+                        <select id="status" class="form-select" required>
+                            <option value="pending">En attente</option>
+                            <option value="scheduled">Planifié</option>
+                            <option value="completed">Terminé</option>
+                            <option value="cancelled">Annulé</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="cancelBtn">Annuler</button>
+                <button class="btn btn-primary" id="saveBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmer la suppression</h3>
+                <button class="modal-close" id="deleteModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.</p>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="cancelDeleteBtn">Annuler</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot Toggle -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot"></i>
+                Assistant PFE
+            </div>
+            <div class="chatbot-controls">
+                <button class="chatbot-control-button" id="themeToggleChat">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="chatbot-close" id="chatbotClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <!-- Messages will be added here dynamically -->
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <button class="chatbot-voice" id="chatbotVoice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="chatbot-send" id="chatbotSend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        // Initialize DataTable
+        $(document).ready(function() {
+            const table = $('#pfeTable').DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                language: {
+                    emptyTable: "Aucun projet trouvé"
+                }
+            });
+            
+            // Dropdown toggle
+            $('#bulkActionsToggle').click(function() {
+                $('#bulkActionsMenu').toggleClass('active');
+            });
+            
+            // Close dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('#bulkActionsMenu').removeClass('active');
+                }
+            });
+            
+            // Select all checkboxes
+            $('#selectAll').change(function() {
+                $('.row-checkbox').prop('checked', $(this).prop('checked'));
+            });
+            
+            // Tab switching
+            $('.tab').click(function() {
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                
+                const tab = $(this).data('tab');
+                
+                // Here you would filter the table based on the selected tab
+                // For demo purposes, we'll just log the selected tab
+                console.log('Selected tab:', tab);
+            });
+            
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                const value = $(this).val().toLowerCase();
+                $('#pfeTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+            
+            // Filter functionality
+            $('#supervisorFilter, #statusFilter, #dateFilter').change(function() {
+                // Here you would filter the table based on the selected filters
+                // For demo purposes, we'll just log the selected values
+                console.log('Supervisor:', $('#supervisorFilter').val());
+                console.log('Status:', $('#statusFilter').val());
+                console.log('Date:', $('#dateFilter').val());
+            });
+            
+            // Add PFE button
+            $('#addPfeBtn').click(function() {
+                $('#modalTitle').text('Ajouter un PFE');
+                $('#pfeForm')[0].reset();
+                $('#pfeModal').addClass('active');
+            });
+            
+            // Edit PFE button
+            $('.edit-btn').click(function() {
+                $('#modalTitle').text('Modifier un PFE');
+                
+                // Here you would populate the form with the data of the selected PFE
+                // For demo purposes, we'll just show the modal
+                $('#pfeModal').addClass('active');
+            });
+            
+            // View PFE button
+            $('.view-btn').click(function() {
+                // Here you would show a modal with the details of the selected PFE
+                // For demo purposes, we'll just log a message
+                console.log('View PFE details');
+            });
+            
+            // Delete PFE button
+            $('.delete-btn').click(function() {
+                $('#deleteModal').addClass('active');
+            });
+            
+            // Close modals
+            $('#modalClose, #cancelBtn').click(function() {
+                $('#pfeModal').removeClass('active');
+            });
+            
+            $('#deleteModalClose, #cancelDeleteBtn').click(function() {
+                $('#deleteModal').removeClass('active');
+            });
+            
+            // Save PFE
+            $('#saveBtn').click(function() {
+                // Here you would save the PFE data
+                // For demo purposes, we'll just close the modal
+                $('#pfeModal').removeClass('active');
+                
+                // Show success message
+                alert('PFE enregistré avec succès !');
+            });
+            
+            // Confirm delete
+            $('#confirmDeleteBtn').click(function() {
+                // Here you would delete the PFE
+                // For demo purposes, we'll just close the modal
+                $('#deleteModal').removeClass('active');
+                
+                // Show success message
+                alert('PFE supprimé avec succès !');
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeToggleChat = document.getElementById('themeToggleChat');
+            const body = document.body;
+            
+            function toggleTheme() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                
+                themeToggle.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                    
+                themeToggleChat.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                
+                localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            }
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            themeToggleChat.addEventListener('click', toggleTheme);
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-theme', savedTheme);
+            
+            themeToggle.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+                
+            themeToggleChat.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+        });
+    </script>
+</body>
+</html>

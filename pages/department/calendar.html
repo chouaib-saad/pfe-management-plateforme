@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier - PFE Platform</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        .calendar-container {
+            padding: 2rem;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-title h1 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-title p {
+            color: var(--text-secondary);
+        }
+        
+        .calendar-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .calendar-navigation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-nav-btn {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        
+        .calendar-nav-btn:hover {
+            color: var(--primary-blue);
+        }
+        
+        .calendar-current-date {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .calendar-view-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .calendar-view-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-view-btn.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: var(--font-weight-semibold);
+            padding: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .calendar-day {
+            min-height: 120px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .calendar-day.other-month {
+            background-color: var(--bg-secondary);
+            opacity: 0.7;
+        }
+        
+        .calendar-day-number {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-day.today .calendar-day-number {
+            color: var(--primary-blue);
+        }
+        
+        .calendar-event {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-event:hover {
+            transform: translateX(2px);
+        }
+        
+        .calendar-event.pfe {
+            background-color: rgba(var(--primary-blue-rgb), 0.1);
+            color: var(--primary-blue);
+            border-left: 3px solid var(--primary-blue);
+        }
+        
+        .calendar-event.jury {
+            background-color: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--accent-color);
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .calendar-event.meeting {
+            background-color: rgba(var(--success-color-rgb), 0.1);
+            color: var(--success-color);
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .calendar-event.deadline {
+            background-color: rgba(var(--error-color-rgb), 0.1);
+            color: var(--error-color);
+            border-left: 3px solid var(--error-color);
+        }
+        
+        .calendar-more-events {
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+            cursor: pointer;
+        }
+        
+        .calendar-more-events:hover {
+            color: var(--primary-blue);
+        }
+        
+        /* Week View */
+        .calendar-week-container {
+            display: none;
+        }
+        
+        .calendar-week-container.active {
+            display: block;
+        }
+        
+        .calendar-week-header {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-week-day {
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+        }
+        
+        .calendar-week-day.today {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+        
+        .calendar-week-time-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 0.25rem;
+        }
+        
+        .calendar-week-time {
+            text-align: right;
+            padding: 0.5rem;
+            color: var(--text-tertiary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .calendar-week-slot {
+            height: 60px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .calendar-week-slot:hover {
+            background-color: var(--bg-secondary);
+        }
+        
+        .calendar-week-event {
+            position: absolute;
+            left: 0;
+            right: 0;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            overflow: hidden;
+            cursor: pointer;
+            z-index: 1;
+        }
+        
+        .calendar-week-event.pfe {
+            background-color: rgba(var(--primary-blue-rgb), 0.2);
+            border-left: 3px solid var(--primary-blue);
+        }
+        
+        .calendar-week-event.jury {
+            background-color: rgba(var(--accent-color-rgb), 0.2);
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .calendar-week-event.meeting {
+            background-color: rgba(var(--success-color-rgb), 0.2);
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .calendar-week-event.deadline {
+            background-color: rgba(var(--error-color-rgb), 0.2);
+            border-left: 3px solid var(--error-color);
+        }
+        
+        /* Session View */
+        .calendar-session-container {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .calendar-session-container.active {
+            display: block;
+        }
+        
+        .calendar-session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-session-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .calendar-session-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .calendar-session-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .calendar-session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .calendar-session-card-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calendar-session-card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .calendar-session-card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+            position: relative;
+        }
+        
+        .calendar-session-card-time {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            position: relative;
+        }
+        
+        .calendar-session-card-body {
+            padding: 1rem;
+        }
+        
+        .calendar-session-info {
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-session-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-session-info-icon {
+            width: 24px;
+            margin-right: 0.5rem;
+            color: var(--text-tertiary);
+        }
+        
+        .calendar-session-info-text {
+            font-size: var(--font-size-sm);
+        }
+        
+        .calendar-session-presentations {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+        
+        .calendar-session-presentation {
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-secondary);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .calendar-session-presentation:hover {
+            background-color: var(--bg-tertiary);
+            transform: translateX(5px);
+        }
+        
+        .calendar-session-presentation-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .calendar-session-presentation-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+        }
+        
+        /* Session Table */
+        .session-table-container {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        .session-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .session-table th, .session-table td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .session-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .session-table th:first-child {
+            width: 100px;
+        }
+        
+        .session-table td {
+            background-color: var(--bg-primary);
+        }
+        
+        .session-table tr:nth-child(even) td {
+            background-color: var(--bg-secondary);
+        }
+        
+        .session-slot {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+        }
+        
+        .session-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .session-event {
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            margin: 0.25rem;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .session-event:hover {
+            transform: scale(1.05);
+        }
+        
+        .session-event.pfe {
+            background-color: rgba(var(--primary-blue-rgb), 0.1);
+            color: var(--primary-blue);
+            border: 1px solid rgba(var(--primary-blue-rgb), 0.3);
+        }
+        
+        .session-event.empty {
+            background-color: rgba(var(--success-color-rgb), 0.1);
+            color: var(--success-color);
+            border: 1px dashed rgba(var(--success-color-rgb), 0.3);
+        }
+        
+        /* Event Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .calendar-container {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .calendar-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .calendar-actions {
+                width: 100%;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .calendar-week-header, .calendar-week-time-grid {
+                grid-template-columns: 60px repeat(1, 1fr);
+            }
+            
+            .calendar-week-day:not(:first-child):not(.today) {
+                display: none;
+            }
+            
+            .calendar-week-slot:not(:nth-child(2)) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="jury-management.html" class="sidebar-link">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des Jurys</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="calendar.html" class="sidebar-link active">
+                    <i class="fas fa-calendar-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Calendrier</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="excel-import.html" class="sidebar-link">
+                    <i class="fas fa-file-excel sidebar-icon"></i>
+                    <span class="sidebar-text">Import Excel</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="statistics.html" class="sidebar-link">
+                    <i class="fas fa-chart-bar sidebar-icon"></i>
+                    <span class="sidebar-text">Statistiques</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="calendar-title">
+                <h1 class="fade-in">Calendrier</h1>
+                <p class="fade-in stagger-1">Planifiez et gérez les présentations de PFE</p>
+            </div>
+            
+            <div class="calendar-actions">
+                <button class="btn btn-primary" id="addEventBtn">
+                    <i class="fas fa-plus mr-2"></i>Ajouter un événement
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-download mr-2"></i>Exporter
+                </button>
+            </div>
+        </div>
+        
+        <div class="calendar-navigation fade-in">
+            <button class="calendar-nav-btn" id="prevBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-current-date" id="currentDate">Avril 2025</div>
+            <button class="calendar-nav-btn" id="nextBtn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <div class="calendar-view-options ml-auto">
+                <div class="calendar-view-btn active" data-view="month">Mois</div>
+                <div class="calendar-view-btn" data-view="week">Semaine</div>
+                <div class="calendar-view-btn" data-view="session">Sessions</div>
+            </div>
+        </div>
+        
+        <!-- Month View -->
+        <div class="calendar-month-container active" id="monthView">
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Dim</div>
+                <div class="calendar-day-header">Lun</div>
+                <div class="calendar-day-header">Mar</div>
+                <div class="calendar-day-header">Mer</div>
+                <div class="calendar-day-header">Jeu</div>
+                <div class="calendar-day-header">Ven</div>
+                <div class="calendar-day-header">Sam</div>
+                
+                <!-- Week 1 -->
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">30</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">31</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">1</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">2</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">3</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">4</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">5</div>
+                </div>
+                
+                <!-- Week 2 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">6</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">7</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">8</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">9</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">10</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">11</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">12</div>
+                </div>
+                
+                <!-- Week 3 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">13</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">14</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">15</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">16</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">17</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">18</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">19</div>
+                    <div class="calendar-event pfe">Développement d'une application mobile (S1)</div>
+                    <div class="calendar-event pfe">Système embarqué pour la domotique (S2)</div>
+                    <div class="calendar-event pfe">IA pour la reconnaissance d'images (S4)</div>
+                    <div class="calendar-more-events">+2 autres</div>
+                </div>
+                
+                <!-- Week 4 -->
+                <div class="calendar-day today">
+                    <div class="calendar-day-number">20</div>
+                    <div class="calendar-event pfe">Système de gestion de base de données (S1)</div>
+                    <div class="calendar-event pfe">Système de recommandation (S2)</div>
+                    <div class="calendar-event pfe">Application web pour la gestion des stocks (S3)</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">21</div>
+                    <div class="calendar-event jury">Réunion du jury (S1)</div>
+                    <div class="calendar-event meeting">Réunion des encadreurs (S5)</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">22</div>
+                    <div class="calendar-event deadline">Date limite de soumission des rapports</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">23</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">24</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">25</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">26</div>
+                </div>
+                
+                <!-- Week 5 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">27</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">28</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">29</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">30</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">1</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">2</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">3</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Week View -->
+        <div class="calendar-week-container" id="weekView">
+            <div class="calendar-week-header">
+                <div></div>
+                <div class="calendar-week-day">Dim 19</div>
+                <div class="calendar-week-day today">Lun 20</div>
+                <div class="calendar-week-day">Mar 21</div>
+                <div class="calendar-week-day">Mer 22</div>
+                <div class="calendar-week-day">Jeu 23</div>
+                <div class="calendar-week-day">Ven 24</div>
+                <div class="calendar-week-day">Sam 25</div>
+            </div>
+            
+            <div class="calendar-week-time-grid">
+                <!-- 8:00 -->
+                <div class="calendar-week-time">08:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 8:30 -->
+                <div class="calendar-week-time">08:30</div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        Développement d'une application mobile
+                    </div>
+                </div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        Système de gestion de base de données
+                    </div>
+                </div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event jury" style="top: 0; height: 90px;">
+                        Réunion du jury
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 9:00 -->
+                <div class="calendar-week-time">09:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 9:30 -->
+                <div class="calendar-week-time">09:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 10:00 -->
+                <div class="calendar-week-time">10:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 10:10 -->
+                <div class="calendar-week-time">10:10</div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        Système embarqué pour la domotique
+                    </div>
+                </div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        Système de recommandation
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 10:30 -->
+                <div class="calendar-week-time">10:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 11:00 -->
+                <div class="calendar-week-time">11:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 11:30 -->
+                <div class="calendar-week-time">11:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 11:50 -->
+                <div class="calendar-week-time">11:50</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        Application web pour la gestion des stocks
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event deadline" style="top: 0; height: 30px;">
+                        Date limite de soumission des rapports
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 12:00 -->
+                <div class="calendar-week-time">12:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 12:30 -->
+                <div class="calendar-week-time">12:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 13:00 -->
+                <div class="calendar-week-time">13:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 13:30 -->
+                <div class="calendar-week-time">13:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 13:50 -->
+                <div class="calendar-week-time">13:50</div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event pfe" style="top: 0; height: 90px;">
+                        IA pour la reconnaissance d'images
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 14:00 -->
+                <div class="calendar-week-time">14:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 14:30 -->
+                <div class="calendar-week-time">14:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 15:00 -->
+                <div class="calendar-week-time">15:00</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                
+                <!-- 15:30 -->
+                <div class="calendar-week-time">15:30</div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot">
+                    <div class="calendar-week-event meeting" style="top: 0; height: 90px;">
+                        Réunion des encadreurs
+                    </div>
+                </div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+                <div class="calendar-week-slot"></div>
+            </div>
+        </div>
+        
+        <!-- Session View -->
+        <div class="calendar-session-container" id="sessionView">
+            <div class="calendar-session-header">
+                <h2 class="calendar-session-title">Sessions de présentation</h2>
+                <button class="btn btn-sm btn-outline">
+                    <i class="fas fa-filter mr-1"></i>Filtrer
+                </button>
+            </div>
+            
+            <div class="session-table-container">
+                <table class="session-table">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Lundi 20/04</th>
+                            <th>Mardi 21/04</th>
+                            <th>Mercredi 22/04</th>
+                            <th>Jeudi 23/04</th>
+                            <th>Vendredi 24/04</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S1</div>
+                                <div class="session-time">08H30 - 10H00</div>
+                            </td>
+                            <td>
+                                <div class="session-event pfe">Système de gestion de base de données</div>
+                            </td>
+                            <td>
+                                <div class="session-event pfe">Réunion du jury</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S2</div>
+                                <div class="session-time">10H10 - 11H40</div>
+                            </td>
+                            <td>
+                                <div class="session-event pfe">Système de recommandation</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S3</div>
+                                <div class="session-time">11H50 - 13H20</div>
+                            </td>
+                            <td>
+                                <div class="session-event pfe">Application web pour la gestion des stocks</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S4</div>
+                                <div class="session-time">13H50 - 15H20</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S5</div>
+                                <div class="session-time">15H30 - 17H00</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event meeting">Réunion des encadreurs</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="session-slot">S6</div>
+                                <div class="session-time">17H10 - 18H40</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                            <td>
+                                <div class="session-event empty">Disponible</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="calendar-session-grid mt-4">
+                <div class="calendar-session-card">
+                    <div class="calendar-session-card-header">
+                        <h3 class="calendar-session-card-title">S1: 08H30 - 10H00</h3>
+                        <p class="calendar-session-card-time">Lundi 20 Avril 2025</p>
+                    </div>
+                    
+                    <div class="calendar-session-card-body">
+                        <div class="calendar-session-info">
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Salle A104</div>
+                            </div>
+                            
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Jury: Dr. Kamal Hassan, Dr. Nadia Alaoui, Dr. Omar Tazi</div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-session-presentations">
+                            <div class="calendar-session-presentation">
+                                <div class="calendar-session-presentation-title">Système de gestion de base de données distribuée</div>
+                                <div class="calendar-session-presentation-info">
+                                    <span>Salma Bennani</span>
+                                    <span>Dr. Omar Tazi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar-session-card">
+                    <div class="calendar-session-card-header">
+                        <h3 class="calendar-session-card-title">S2: 10H10 - 11H40</h3>
+                        <p class="calendar-session-card-time">Lundi 20 Avril 2025</p>
+                    </div>
+                    
+                    <div class="calendar-session-card-body">
+                        <div class="calendar-session-info">
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Salle B203</div>
+                            </div>
+                            
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Jury: Dr. Omar Tazi, Dr. Nadia Alaoui, Dr. Hassan Bennani</div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-session-presentations">
+                            <div class="calendar-session-presentation">
+                                <div class="calendar-session-presentation-title">Développement d'un système de recommandation</div>
+                                <div class="calendar-session-presentation-info">
+                                    <span>Karim Mansouri</span>
+                                    <span>Dr. Hassan Bennani</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar-session-card">
+                    <div class="calendar-session-card-header">
+                        <h3 class="calendar-session-card-title">S3: 11H50 - 13H20</h3>
+                        <p class="calendar-session-card-time">Lundi 20 Avril 2025</p>
+                    </div>
+                    
+                    <div class="calendar-session-card-body">
+                        <div class="calendar-session-info">
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Salle A104</div>
+                            </div>
+                            
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Jury: Dr. Mohamed Karim, Dr. Kamal Hassan</div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-session-presentations">
+                            <div class="calendar-session-presentation">
+                                <div class="calendar-session-presentation-title">Application web pour la gestion des stocks</div>
+                                <div class="calendar-session-presentation-info">
+                                    <span>Leila Chakir</span>
+                                    <span>Dr. Mohamed Karim</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar-session-card">
+                    <div class="calendar-session-card-header">
+                        <h3 class="calendar-session-card-title">S5: 15H30 - 17H00</h3>
+                        <p class="calendar-session-card-time">Mardi 21 Avril 2025</p>
+                    </div>
+                    
+                    <div class="calendar-session-card-body">
+                        <div class="calendar-session-info">
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Salle de réunion C105</div>
+                            </div>
+                            
+                            <div class="calendar-session-info-item">
+                                <div class="calendar-session-info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="calendar-session-info-text">Tous les encadreurs</div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-session-presentations">
+                            <div class="calendar-session-presentation">
+                                <div class="calendar-session-presentation-title">Réunion des encadreurs</div>
+                                <div class="calendar-session-presentation-info">
+                                    <span>Coordination des PFEs</span>
+                                    <span>Dr. Nadia Alaoui</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Event Modal -->
+    <div class="modal-backdrop" id="addEventModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter un événement</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addEventForm">
+                    <div class="form-group">
+                        <label for="eventTitle" class="form-label">Titre</label>
+                        <input type="text" id="eventTitle" class="form-control" placeholder="Titre de l'événement" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventType" class="form-label">Type</label>
+                        <select id="eventType" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un type</option>
+                            <option value="pfe">Présentation PFE</option>
+                            <option value="jury">Réunion du jury</option>
+                            <option value="meeting">Réunion</option>
+                            <option value="deadline">Date limite</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventDate" class="form-label">Date</label>
+                        <input type="date" id="eventDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventSession" class="form-label">Session</label>
+                        <select id="eventSession" class="form-select">
+                            <option value="" disabled selected>Sélectionner une session</option>
+                            <option value="s1">S1: 08H30 - 10H00</option>
+                            <option value="s2">S2: 10H10 - 11H40</option>
+                            <option value="s3">S3: 11H50 - 13H20</option>
+                            <option value="s4">S4: 13H50 - 15H20</option>
+                            <option value="s5">S5: 15H30 - 17H00</option>
+                            <option value="s6">S6: 17H10 - 18H40</option>
+                            <option value="custom">Personnalisé</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row hidden" id="customTimeRow">
+                        <div class="form-group col-md-6">
+                            <label for="eventStartTime" class="form-label">Heure de début</label>
+                            <input type="time" id="eventStartTime" class="form-control">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="eventEndTime" class="form-label">Heure de fin</label>
+                            <input type="time" id="eventEndTime" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventLocation" class="form-label">Lieu</label>
+                        <input type="text" id="eventLocation" class="form-control" placeholder="Lieu de l'événement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventDescription" class="form-label">Description</label>
+                        <textarea id="eventDescription" class="form-control" rows="3" placeholder="Description de l'événement"></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="pfeFields">
+                        <label for="eventStudent" class="form-label">Étudiant</label>
+                        <input type="text" id="eventStudent" class="form-control" placeholder="Nom de l'étudiant">
+                    </div>
+                    
+                    <div class="form-group" id="pfeFields2">
+                        <label for="eventSupervisor" class="form-label">Encadreur</label>
+                        <input type="text" id="eventSupervisor" class="form-control" placeholder="Nom de l'encadreur">
+                    </div>
+                    
+                    <div class="form-group" id="juryFields">
+                        <label for="eventJury" class="form-label">Membres du jury</label>
+                        <input type="text" id="eventJury" class="form-control" placeholder="Noms des membres du jury">
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAddEvent">Annuler</button>
+                <button class="btn btn-primary" id="submitAddEvent">Ajouter</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const calendarContainer = document.querySelector('.calendar-container');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                calendarContainer.classList.toggle('sidebar-collapsed');
+            });
+        }
+        
+        // Calendar Navigation
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentDate = document.getElementById('currentDate');
+        
+        let currentMonth = 3; // April (0-indexed)
+        let currentYear = 2025;
+        
+        function updateCalendarTitle() {
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            currentDate.textContent = `${months[currentMonth]} ${currentYear}`;
+        }
+        
+        prevBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendarTitle();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendarTitle();
+        });
+        
+        // Calendar View Switching
+        const viewButtons = document.querySelectorAll('.calendar-view-btn');
+        const monthView = document.getElementById('monthView');
+        const weekView = document.getElementById('weekView');
+        const sessionView = document.getElementById('sessionView');
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                viewButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Hide all views
+                monthView.classList.remove('active');
+                weekView.classList.remove('active');
+                sessionView.classList.remove('active');
+                
+                // Show selected view
+                const view = button.getAttribute('data-view');
+                if (view === 'month') {
+                    monthView.classList.add('active');
+                } else if (view === 'week') {
+                    weekView.classList.add('active');
+                } else if (view === 'session') {
+                    sessionView.classList.add('active');
+                }
+            });
+        });
+        
+        // Modal Controls
+        const addEventBtn = document.getElementById('addEventBtn');
+        const addEventModal = document.getElementById('addEventModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAddEvent = document.getElementById('cancelAddEvent');
+        const submitAddEvent = document.getElementById('submitAddEvent');
+        const eventType = document.getElementById('eventType');
+        const eventSession = document.getElementById('eventSession');
+        const customTimeRow = document.getElementById('customTimeRow');
+        const pfeFields = document.getElementById('pfeFields');
+        const pfeFields2 = document.getElementById('pfeFields2');
+        const juryFields = document.getElementById('juryFields');
+        
+        if (addEventBtn && addEventModal) {
+            addEventBtn.addEventListener('click', () => {
+                addEventModal.classList.add('active');
+            });
+            
+            closeModal.addEventListener('click', () => {
+                addEventModal.classList.remove('active');
+            });
+            
+            cancelAddEvent.addEventListener('click', () => {
+                addEventModal.classList.remove('active');
+            });
+            
+            submitAddEvent.addEventListener('click', () => {
+                // In a real application, this would submit the form data
+                alert('Événement ajouté avec succès!');
+                addEventModal.classList.remove('active');
+            });
+            
+            eventType.addEventListener('change', () => {
+                const type = eventType.value;
+                
+                // Hide all conditional fields
+                pfeFields.style.display = 'none';
+                pfeFields2.style.display = 'none';
+                juryFields.style.display = 'none';
+                
+                // Show fields based on event type
+                if (type === 'pfe') {
+                    pfeFields.style.display = 'block';
+                    pfeFields2.style.display = 'block';
+                    juryFields.style.display = 'block';
+                } else if (type === 'jury') {
+                    juryFields.style.display = 'block';
+                }
+            });
+            
+            eventSession.addEventListener('change', () => {
+                if (eventSession.value === 'custom') {
+                    customTimeRow.classList.remove('hidden');
+                } else {
+                    customTimeRow.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Calendar Events
+        const calendarEvents = document.querySelectorAll('.calendar-event');
+        const sessionEvents = document.querySelectorAll('.session-event');
+        const weekEvents = document.querySelectorAll('.calendar-week-event');
+        
+        function addEventListeners(events) {
+            events.forEach(event => {
+                event.addEventListener('click', () => {
+                    alert(`Événement: ${event.textContent.trim()}`);
+                });
+            });
+        }
+        
+        addEventListeners(calendarEvents);
+        addEventListeners(sessionEvents);
+        addEventListeners(weekEvents);
+    </script>
+</body>
+</html>

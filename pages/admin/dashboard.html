@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - Administrateur</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        .admin-container {
+            padding: 2rem;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-message h1 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-message p {
+            color: var(--text-secondary);
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .users-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .users-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .users-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .users-table th, .users-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .users-table th {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+        }
+        
+        .users-table tr:hover td {
+            background-color: var(--bg-secondary);
+        }
+        
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .user-status.active {
+            background-color: rgba(var(--success-color-rgb), 0.1);
+            color: var(--success-color);
+        }
+        
+        .user-status.inactive {
+            background-color: rgba(var(--error-color-rgb), 0.1);
+            color: var(--error-color);
+        }
+        
+        .user-status.pending {
+            background-color: rgba(var(--warning-color-rgb), 0.1);
+            color: var(--warning-color);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .activity-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .activity-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .system-info {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        
+        .system-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .system-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .system-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .system-item {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        
+        .system-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .system-value {
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .progress-container {
+            margin-top: 0.5rem;
+            height: 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: var(--radius-full);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-container {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .system-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Add User Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link active">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="users.html" class="sidebar-link">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Utilisateurs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="departments.html" class="sidebar-link">
+                    <i class="fas fa-building sidebar-icon"></i>
+                    <span class="sidebar-text">Départements</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="welcome-message">
+                <h1 class="fade-in">Bonjour, Administrateur</h1>
+                <p class="fade-in stagger-1">Bienvenue sur votre tableau de bord</p>
+            </div>
+            
+            <div class="admin-actions">
+                <button class="btn btn-primary" id="addUserBtn">
+                    <i class="fas fa-user-plus mr-2"></i>Ajouter un utilisateur
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-download mr-2"></i>Exporter
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card fade-in-up">
+                <div class="stat-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">42</div>
+                <div class="stat-label">Utilisateurs</div>
+            </div>
+            
+            <div class="stat-card fade-in-up stagger-1">
+                <div class="stat-icon" style="background-color: rgba(52, 199, 89, 0.1); color: var(--success-color);">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-value">15</div>
+                <div class="stat-label">Départements</div>
+            </div>
+            
+            <div class="stat-card fade-in-up stagger-2">
+                <div class="stat-icon" style="background-color: rgba(255, 149, 0, 0.1); color: var(--accent-color);">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-value">128</div>
+                <div class="stat-label">PFEs</div>
+            </div>
+            
+            <div class="stat-card fade-in-up stagger-3">
+                <div class="stat-icon" style="background-color: rgba(90, 200, 250, 0.1); color: var(--info-color);">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-value">36</div>
+                <div class="stat-label">Enseignants</div>
+            </div>
+        </div>
+        
+        <div class="admin-grid">
+            <div class="users-container fade-in-up">
+                <div class="users-header">
+                    <h2 class="users-title">Utilisateurs récents</h2>
+                    <div class="users-actions">
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-filter mr-1"></i>Filtrer
+                        </button>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-sync-alt mr-1"></i>Actualiser
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mohamed Karim</td>
+                                <td>m.karim@exemple.com</td>
+                                <td>Enseignant</td>
+                                <td><span class="user-status active">Actif</span></td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Nadia Alaoui</td>
+                                <td>n.alaoui@exemple.com</td>
+                                <td>Chef de département</td>
+                                <td><span class="user-status active">Actif</span></td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ahmed Benali</td>
+                                <td>a.benali@exemple.com</td>
+                                <td>Étudiant</td>
+                                <td><span class="user-status active">Actif</span></td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Fatima Zahra</td>
+                                <td>f.zahra@exemple.com</td>
+                                <td>Étudiant</td>
+                                <td><span class="user-status inactive">Inactif</span></td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Kamal Hassan</td>
+                                <td>k.hassan@exemple.com</td>
+                                <td>Enseignant</td>
+                                <td><span class="user-status pending">En attente</span></td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-only btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 text-right">
+                    <a href="users.html" class="btn btn-sm btn-outline">
+                        Voir tous les utilisateurs
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="activity-container fade-in-up stagger-1">
+                <div class="activity-header">
+                    <h2 class="activity-title">Activités récentes</h2>
+                    <a href="#" class="btn btn-sm btn-outline">Voir tout</a>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Nouvel utilisateur créé: <strong>Kamal Hassan</strong></div>
+                            <div class="activity-time">Il y a 2 heures</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(52, 199, 89, 0.1); color: var(--success-color);">
+                            <i class="fas fa-file-import"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Importation Excel réussie: <strong>15 nouveaux PFEs ajoutés</strong></div>
+                            <div class="activity-time">Il y a 5 heures</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(255, 149, 0, 0.1); color: var(--accent-color);">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Nouveau département créé: <strong>Génie Électrique</strong></div>
+                            <div class="activity-time">Il y a 1 jour</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(255, 59, 48, 0.1); color: var(--error-color);">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Utilisateur supprimé: <strong>Mehdi Tazi</strong></div>
+                            <div class="activity-time">Il y a 2 jours</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(90, 200, 250, 0.1); color: var(--info-color);">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Paramètres système mis à jour</div>
+                            <div class="activity-time">Il y a 3 jours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-info fade-in-up">
+            <div class="system-header">
+                <h2 class="system-title">Informations système</h2>
+                <button class="btn btn-sm btn-outline">
+                    <i class="fas fa-sync-alt mr-1"></i>Actualiser
+                </button>
+            </div>
+            
+            <div class="system-grid">
+                <div class="system-item">
+                    <div class="system-label">Utilisation CPU</div>
+                    <div class="system-value">32%</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 32%; background-color: var(--primary-blue);"></div>
+                    </div>
+                </div>
+                
+                <div class="system-item">
+                    <div class="system-label">Utilisation mémoire</div>
+                    <div class="system-value">64%</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 64%; background-color: var(--accent-color);"></div>
+                    </div>
+                </div>
+                
+                <div class="system-item">
+                    <div class="system-label">Espace disque</div>
+                    <div class="system-value">48%</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 48%; background-color: var(--success-color);"></div>
+                    </div>
+                </div>
+                
+                <div class="system-item">
+                    <div class="system-label">Trafic réseau</div>
+                    <div class="system-value">76%</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 76%; background-color: var(--info-color);"></div>
+                    </div>
+                </div>
+                
+                <div class="system-item">
+                    <div class="system-label">Version du système</div>
+                    <div class="system-value">PFE Platform v1.0.0</div>
+                </div>
+                
+                <div class="system-item">
+                    <div class="system-label">Dernière mise à jour</div>
+                    <div class="system-value">19 Avril 2025</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add User Modal -->
+    <div class="modal-backdrop" id="addUserModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter un nouvel utilisateur</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label for="userName" class="form-label">Nom complet</label>
+                        <input type="text" id="userName" class="form-control" placeholder="Nom et prénom" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userEmail" class="form-label">Email</label>
+                        <input type="email" id="userEmail" class="form-control" placeholder="Adresse email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userRole" class="form-label">Rôle</label>
+                        <select id="userRole" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un rôle</option>
+                            <option value="admin">Administrateur</option>
+                            <option value="head">Chef de département</option>
+                            <option value="teacher">Enseignant</option>
+                            <option value="student">Étudiant</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userDepartment" class="form-label">Département</label>
+                        <select id="userDepartment" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un département</option>
+                            <option value="1">Informatique</option>
+                            <option value="2">Électronique</option>
+                            <option value="3">Mécanique</option>
+                            <option value="4">Mathématique</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userPassword" class="form-label">Mot de passe</label>
+                        <input type="password" id="userPassword" class="form-control" placeholder="Mot de passe" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userConfirmPassword" class="form-label">Confirmer le mot de passe</label>
+                        <input type="password" id="userConfirmPassword" class="form-control" placeholder="Confirmer le mot de passe" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            Envoyer un email d'invitation
+                            <input type="checkbox" checked="checked">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAddUser">Annuler</button>
+                <button class="btn btn-primary" id="submitAddUser">Ajouter</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const adminContainer = document.querySelector('.admin-container');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                adminContainer.classList.toggle('sidebar-collapsed');
+            });
+        }
+        
+        // Modal Controls
+        const addUserBtn = document.getElementById('addUserBtn');
+        const addUserModal = document.getElementById('addUserModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAddUser = document.getElementById('cancelAddUser');
+        const submitAddUser = document.getElementById('submitAddUser');
+        
+        if (addUserBtn && addUserModal) {
+            addUserBtn.addEventListener('click', () => {
+                addUserModal.classList.add('active');
+            });
+            
+            closeModal.addEventListener('click', () => {
+                addUserModal.classList.remove('active');
+            });
+            
+            cancelAddUser.addEventListener('click', () => {
+                addUserModal.classList.remove('active');
+            });
+            
+            submitAddUser.addEventListener('click', () => {
+                // In a real application, this would submit the form data
+                alert('Utilisateur ajouté avec succès!');
+                addUserModal.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>

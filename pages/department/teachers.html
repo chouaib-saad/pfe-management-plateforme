@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Enseignants - Plateforme PFE</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/buttons.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo img {
+            height: 40px;
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1rem 0;
+        }
+        
+        .sidebar-menu-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem 0 0.5rem 1rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background-color: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table tr:hover td {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .badge-success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .badge-info {
+            background-color: var(--info-light);
+            color: var(--info-dark);
+        }
+        
+        .badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-full);
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+        }
+        
+        .avatar-sm {
+            width: 2rem;
+            height: 2rem;
+            font-size: var(--font-size-xs);
+        }
+        
+        .avatar-lg {
+            width: 3rem;
+            height: 3rem;
+            font-size: var(--font-size-md);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-name {
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .user-email {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-icon:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .btn-icon-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .btn-icon-primary:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .btn-icon-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .btn-icon-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-icon-success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .btn-icon-success:hover {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-icon-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .btn-icon-warning:hover {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .form-check-label {
+            color: var(--text-secondary);
+        }
+        
+        .form-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination-item {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-item:hover {
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+        }
+        
+        .pagination-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .pagination-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            outline: none;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: 0.5rem;
+            min-width: 200px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .custom-checkbox {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 0.5rem;
+        }
+        
+        .custom-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-quaternary);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-xs);
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .tag i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Calendar styles */
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+        }
+        
+        .calendar-day {
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            min-height: 100px;
+            background-color: var(--bg-primary);
+            transition: all 0.3s;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .calendar-day.today {
+            border-color: var(--primary-blue);
+            background-color: var(--primary-blue-light);
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.5;
+        }
+        
+        .calendar-day-number {
+            font-weight: var(--font-weight-medium);
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-event {
+            font-size: var(--font-size-xs);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        
+        .calendar-event-primary {
+            background-color: var(--primary-blue-light);
+            color: var(--primary-blue-dark);
+        }
+        
+        .calendar-event-success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .calendar-event-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        .calendar-event-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .calendar-event-info {
+            background-color: var(--info-light);
+            color: var(--info-dark);
+        }
+        
+        /* Availability styles */
+        .availability-grid {
+            display: grid;
+            grid-template-columns: auto repeat(6, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .availability-header {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .availability-time {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+        }
+        
+        .availability-cell {
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .availability-cell:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .availability-cell.available {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+        }
+        
+        .availability-cell.unavailable {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+        }
+        
+        .availability-cell.busy {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem 0.5rem;
+            }
+            
+            .sidebar-logo-text {
+                display: none;
+            }
+            
+            .sidebar-menu-item span {
+                display: none;
+            }
+            
+            .sidebar-menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .sidebar-menu-item i {
+                margin-right: 0;
+            }
+            
+            .sidebar-menu-title {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .calendar-container {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .availability-grid {
+                grid-template-columns: auto 1fr;
+            }
+            
+            .availability-header:not(:first-child),
+            .availability-cell:not(:nth-child(2n+1)) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span class="sidebar-logo-text">PFE Platform</span>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="sidebar-menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Tableau de bord</span>
+                </a>
+                
+                <a href="pfe-management.html" class="sidebar-menu-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Gestion des PFE</span>
+                </a>
+                
+                <a href="excel-import.html" class="sidebar-menu-item">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Import Excel</span>
+                </a>
+                
+                <a href="jury-management.html" class="sidebar-menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Gestion des jurys</span>
+                </a>
+                
+                <a href="calendar.html" class="sidebar-menu-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendrier</span>
+                </a>
+                
+                <a href="statistics.html" class="sidebar-menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistiques</span>
+                </a>
+                
+                <a href="teachers.html" class="sidebar-menu-item active">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Enseignants</span>
+                </a>
+                
+                <div class="sidebar-divider"></div>
+                
+                <a href="settings.html" class="sidebar-menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Paramètres</span>
+                </a>
+                
+                <a href="../auth/login.html" class="sidebar-menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Enseignants</h1>
+                
+                <div class="page-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" id="bulkActionsToggle">
+                            <i class="fas fa-cog"></i>
+                            <span>Actions groupées</span>
+                        </button>
+                        
+                        <div class="dropdown-menu" id="bulkActionsMenu">
+                            <div class="dropdown-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>Envoyer un email</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Planifier une réunion</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-file-export"></i>
+                                <span>Exporter en Excel</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Exporter en PDF</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="addTeacherBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Ajouter un enseignant</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="teachers">Liste des enseignants</div>
+                <div class="tab" data-tab="availability">Disponibilités</div>
+                <div class="tab" data-tab="workload">Charge de travail</div>
+            </div>
+            
+            <!-- Tab Content: Teachers List -->
+            <div class="tab-content active" id="teachers-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Rechercher un enseignant..." id="searchTeacher">
+                        </div>
+                        
+                        <div class="card-actions">
+                            <div class="filter-item">
+                                <select class="form-select" id="departmentFilter">
+                                    <option value="">Tous les départements</option>
+                                    <option value="info">Informatique</option>
+                                    <option value="telecom">Télécommunications</option>
+                                    <option value="electro">Électronique</option>
+                                    <option value="meca">Mécanique</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="teachersTable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="selectAll">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th>Enseignant</th>
+                                    <th>Département</th>
+                                    <th>Projets encadrés</th>
+                                    <th>Participation aux jurys</th>
+                                    <th>Ratio</th>
+                                    <th>Disponibilité</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Row 1 -->
+                                <tr>
+                                    <td>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="avatar">KH</div>
+                                            <div>
+                                                <div class="user-name">Dr. Kamel Hamrouni</div>
+                                                <div class="user-email">kamel.hamrouni@issatso.u-sousse.tn</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Informatique</td>
+                                    <td>12</td>
+                                    <td>36</td>
+                                    <td>
+                                        <span class="badge badge-success">3.0</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar progress-bar-success" style="width: 70%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Row 2 -->
+                                <tr>
+                                    <td>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="avatar">SF</div>
+                                            <div>
+                                                <div class="user-name">Dr. Sana Fakhfakh</div>
+                                                <div class="user-email">sana.fakhfakh@issatso.u-sousse.tn</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Télécommunications</td>
+                                    <td>10</td>
+                                    <td>30</td>
+                                    <td>
+                                        <span class="badge badge-success">3.0</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar progress-bar-warning" style="width: 85%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Row 3 -->
+                                <tr>
+                                    <td>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="avatar">NT</div>
+                                            <div>
+                                                <div class="user-name">Dr. Nabil Tabbane</div>
+                                                <div class="user-email">nabil.tabbane@issatso.u-sousse.tn</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Télécommunications</td>
+                                    <td>8</td>
+                                    <td>24</td>
+                                    <td>
+                                        <span class="badge badge-success">3.0</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar progress-bar-success" style="width: 60%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Row 4 -->
+                                <tr>
+                                    <td>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="avatar">LB</div>
+                                            <div>
+                                                <div class="user-name">Dr. Lamia Ben Amor</div>
+                                                <div class="user-email">lamia.benamor@issatso.u-sousse.tn</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Informatique</td>
+                                    <td>7</td>
+                                    <td>21</td>
+                                    <td>
+                                        <span class="badge badge-success">3.0</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar progress-bar-danger" style="width: 90%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Row 5 -->
+                                <tr>
+                                    <td>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="avatar">FB</div>
+                                            <div>
+                                                <div class="user-name">Dr. Faouzi Benzarti</div>
+                                                <div class="user-email">faouzi.benzarti@issatso.u-sousse.tn</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Électronique</td>
+                                    <td>6</td>
+                                    <td>18</td>
+                                    <td>
+                                        <span class="badge badge-success">3.0</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar progress-bar-success" style="width: 50%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-icon-primary view-btn" data-tooltip="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-success edit-btn" data-tooltip="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-danger delete-btn" data-tooltip="Supprimer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <div class="pagination-item disabled">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                        <div class="pagination-item active">1</div>
+                        <div class="pagination-item">2</div>
+                        <div class="pagination-item">3</div>
+                        <div class="pagination-item">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Availability -->
+            <div class="tab-content" id="availability-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Disponibilités des enseignants</h2>
+                        
+                        <div class="card-actions">
+                            <div class="filter-item">
+                                <select class="form-select" id="teacherFilter">
+                                    <option value="">Tous les enseignants</option>
+                                    <option value="1">Dr. Kamel Hamrouni</option>
+                                    <option value="2">Dr. Sana Fakhfakh</option>
+                                    <option value="3">Dr. Nabil Tabbane</option>
+                                    <option value="4">Dr. Lamia Ben Amor</option>
+                                    <option value="5">Dr. Faouzi Benzarti</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-item">
+                                <select class="form-select" id="weekFilter">
+                                    <option value="current">Semaine actuelle</option>
+                                    <option value="next">Semaine prochaine</option>
+                                    <option value="after">Dans deux semaines</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-header">
+                        <div class="calendar-title">10 - 16 Juin 2025</div>
+                        <div class="calendar-nav">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="availability-grid">
+                        <div class="availability-header">Session</div>
+                        <div class="availability-header">Lundi</div>
+                        <div class="availability-header">Mardi</div>
+                        <div class="availability-header">Mercredi</div>
+                        <div class="availability-header">Jeudi</div>
+                        <div class="availability-header">Vendredi</div>
+                        <div class="availability-header">Samedi</div>
+                        
+                        <div class="availability-time">S1 (08H30-10H00)</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell busy">Jury PFE-2025-001</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        
+                        <div class="availability-time">S2 (10H10-11H40)</div>
+                        <div class="availability-cell busy">Jury PFE-2025-002</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell busy">Jury PFE-2025-003</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        
+                        <div class="availability-time">S3 (11H50-13H20)</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell busy">Jury PFE-2025-004</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        
+                        <div class="availability-time">S4 (13H50-15H20)</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell busy">Jury PFE-2025-005</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        
+                        <div class="availability-time">S5 (15H30-17H00)</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell busy">Jury PFE-2025-006</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        
+                        <div class="availability-time">S6 (17H10-18H40)</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell available">Disponible</div>
+                        <div class="availability-cell unavailable">Indisponible</div>
+                    </div>
+                    
+                    <div class="card-header">
+                        <h2 class="card-title">Légende</h2>
+                    </div>
+                    
+                    <div class="tags">
+                        <div class="tag" style="background-color: var(--success-light); color: var(--success-dark);">
+                            <i class="fas fa-check-circle"></i>
+                            Disponible
+                        </div>
+                        <div class="tag" style="background-color: var(--warning-light); color: var(--warning-dark);">
+                            <i class="fas fa-calendar-check"></i>
+                            Jury programmé
+                        </div>
+                        <div class="tag" style="background-color: var(--danger-light); color: var(--danger-dark);">
+                            <i class="fas fa-times-circle"></i>
+                            Indisponible
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Workload -->
+            <div class="tab-content" id="workload-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Charge de travail des enseignants</h2>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Enseignant</th>
+                                    <th>Projets encadrés</th>
+                                    <th>Participation aux jurys</th>
+                                    <th>Ratio</th>
+                                    <th>Charge</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dr. Kamel Hamrouni</td>
+                                    <td>12</td>
+                                    <td>36</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-success" style="width: 70%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">Équilibré</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Sana Fakhfakh</td>
+                                    <td>10</td>
+                                    <td>30</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-warning" style="width: 85%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-warning">Chargé</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Nabil Tabbane</td>
+                                    <td>8</td>
+                                    <td>24</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-success" style="width: 60%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">Équilibré</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Lamia Ben Amor</td>
+                                    <td>7</td>
+                                    <td>21</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-danger" style="width: 90%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-danger">Surchargé</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Faouzi Benzarti</td>
+                                    <td>6</td>
+                                    <td>18</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-success" style="width: 50%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">Équilibré</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Hanen Idoudi</td>
+                                    <td>5</td>
+                                    <td>15</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-success" style="width: 40%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">Équilibré</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Lamia Chaari</td>
+                                    <td>5</td>
+                                    <td>15</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-success" style="width: 40%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">Équilibré</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Mohamed Jmaiel</td>
+                                    <td>4</td>
+                                    <td>12</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-info" style="width: 30%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">Disponible</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Rim Haddad</td>
+                                    <td>4</td>
+                                    <td>12</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-info" style="width: 30%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">Disponible</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Sami Tabbane</td>
+                                    <td>3</td>
+                                    <td>9</td>
+                                    <td>3.0</td>
+                                    <td>
+                                        <div class="progress" style="width: 100%;">
+                                            <div class="progress-bar progress-bar-info" style="width: 20%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">Disponible</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Teacher Modal -->
+    <div class="modal" id="teacherModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter un enseignant</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="teacherForm">
+                    <div class="form-group">
+                        <label for="teacherName" class="form-label">Nom complet</label>
+                        <input type="text" id="teacherName" class="form-control" placeholder="Nom complet de l'enseignant" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacherEmail" class="form-label">Email</label>
+                        <input type="email" id="teacherEmail" class="form-control" placeholder="email@issatso.u-sousse.tn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacherDepartment" class="form-label">Département</label>
+                        <select id="teacherDepartment" class="form-select" required>
+                            <option value="">Sélectionner un département</option>
+                            <option value="info">Informatique</option>
+                            <option value="telecom">Télécommunications</option>
+                            <option value="electro">Électronique</option>
+                            <option value="meca">Mécanique</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacherPhone" class="form-label">Téléphone</label>
+                        <input type="tel" id="teacherPhone" class="form-control" placeholder="Numéro de téléphone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacherSpeciality" class="form-label">Spécialité</label>
+                        <input type="text" id="teacherSpeciality" class="form-control" placeholder="Spécialité de l'enseignant">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Disponibilité</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableMonday" class="form-check-input">
+                            <label for="availableMonday" class="form-check-label">Lundi</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableTuesday" class="form-check-input">
+                            <label for="availableTuesday" class="form-check-label">Mardi</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableWednesday" class="form-check-input">
+                            <label for="availableWednesday" class="form-check-label">Mercredi</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableThursday" class="form-check-input">
+                            <label for="availableThursday" class="form-check-label">Jeudi</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableFriday" class="form-check-input">
+                            <label for="availableFriday" class="form-check-label">Vendredi</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableSaturday" class="form-check-input">
+                            <label for="availableSaturday" class="form-check-label">Samedi</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Sessions disponibles</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS1" class="form-check-input">
+                            <label for="availableS1" class="form-check-label">S1 (08H30-10H00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS2" class="form-check-input">
+                            <label for="availableS2" class="form-check-label">S2 (10H10-11H40)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS3" class="form-check-input">
+                            <label for="availableS3" class="form-check-label">S3 (11H50-13H20)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS4" class="form-check-input">
+                            <label for="availableS4" class="form-check-label">S4 (13H50-15H20)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS5" class="form-check-input">
+                            <label for="availableS5" class="form-check-label">S5 (15H30-17H00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="availableS6" class="form-check-input">
+                            <label for="availableS6" class="form-check-label">S6 (17H10-18H40)</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="cancelBtn">Annuler</button>
+                <button class="btn btn-primary" id="saveBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmer la suppression</h3>
+                <button class="modal-close" id="deleteModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet enseignant ? Cette action est irréversible.</p>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="cancelDeleteBtn">Annuler</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot Toggle -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <i class="fas fa-robot"></i>
+                Assistant PFE
+            </div>
+            <div class="chatbot-controls">
+                <button class="chatbot-control-button" id="themeToggleChat">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="chatbot-close" id="chatbotClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <!-- Messages will be added here dynamically -->
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <button class="chatbot-voice" id="chatbotVoice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="chatbot-send" id="chatbotSend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        // Initialize DataTable
+        $(document).ready(function() {
+            const table = $('#teachersTable').DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                language: {
+                    emptyTable: "Aucun enseignant trouvé"
+                }
+            });
+            
+            // Dropdown toggle
+            $('#bulkActionsToggle').click(function() {
+                $('#bulkActionsMenu').toggleClass('active');
+            });
+            
+            // Close dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('#bulkActionsMenu').removeClass('active');
+                }
+            });
+            
+            // Select all checkboxes
+            $('#selectAll').change(function() {
+                $('.row-checkbox').prop('checked', $(this).prop('checked'));
+            });
+            
+            // Tab switching
+            $('.tab').click(function() {
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                
+                const tab = $(this).data('tab');
+                
+                // Hide all tab contents
+                $('.tab-content').removeClass('active');
+                
+                // Show the selected tab content
+                $(`#${tab}-tab`).addClass('active');
+            });
+            
+            // Search functionality
+            $('#searchTeacher').on('keyup', function() {
+                const value = $(this).val().toLowerCase();
+                $('#teachersTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+            
+            // Department filter
+            $('#departmentFilter').change(function() {
+                const value = $(this).val().toLowerCase();
+                
+                if (value === '') {
+                    // Show all rows if no filter is selected
+                    $('#teachersTable tbody tr').show();
+                } else {
+                    // Hide rows that don't match the selected department
+                    $('#teachersTable tbody tr').filter(function() {
+                        const department = $(this).find('td:nth-child(3)').text().toLowerCase();
+                        return department.indexOf(value) === -1;
+                    }).hide();
+                    
+                    // Show rows that match the selected department
+                    $('#teachersTable tbody tr').filter(function() {
+                        const department = $(this).find('td:nth-child(3)').text().toLowerCase();
+                        return department.indexOf(value) > -1;
+                    }).show();
+                }
+            });
+            
+            // Teacher filter for availability tab
+            $('#teacherFilter').change(function() {
+                // Here you would update the availability grid based on the selected teacher
+                // For demo purposes, we'll just log the selected teacher
+                console.log('Selected teacher:', $(this).val());
+            });
+            
+            // Week filter for availability tab
+            $('#weekFilter').change(function() {
+                // Here you would update the availability grid based on the selected week
+                // For demo purposes, we'll just log the selected week
+                console.log('Selected week:', $(this).val());
+            });
+            
+            // Add Teacher button
+            $('#addTeacherBtn').click(function() {
+                $('#modalTitle').text('Ajouter un enseignant');
+                $('#teacherForm')[0].reset();
+                $('#teacherModal').addClass('active');
+            });
+            
+            // Edit Teacher button
+            $('.edit-btn').click(function() {
+                $('#modalTitle').text('Modifier un enseignant');
+                
+                // Here you would populate the form with the data of the selected teacher
+                // For demo purposes, we'll just show the modal
+                $('#teacherModal').addClass('active');
+            });
+            
+            // View Teacher button
+            $('.view-btn').click(function() {
+                // Here you would show a modal with the details of the selected teacher
+                // For demo purposes, we'll just log a message
+                console.log('View teacher details');
+            });
+            
+            // Delete Teacher button
+            $('.delete-btn').click(function() {
+                $('#deleteModal').addClass('active');
+            });
+            
+            // Close modals
+            $('#modalClose, #cancelBtn').click(function() {
+                $('#teacherModal').removeClass('active');
+            });
+            
+            $('#deleteModalClose, #cancelDeleteBtn').click(function() {
+                $('#deleteModal').removeClass('active');
+            });
+            
+            // Save Teacher
+            $('#saveBtn').click(function() {
+                // Here you would save the teacher data
+                // For demo purposes, we'll just close the modal
+                $('#teacherModal').removeClass('active');
+                
+                // Show success message
+                alert('Enseignant enregistré avec succès !');
+            });
+            
+            // Confirm delete
+            $('#confirmDeleteBtn').click(function() {
+                // Here you would delete the teacher
+                // For demo purposes, we'll just close the modal
+                $('#deleteModal').removeClass('active');
+                
+                // Show success message
+                alert('Enseignant supprimé avec succès !');
+            });
+            
+            // Availability cell click
+            $('.availability-cell').click(function() {
+                // Toggle availability status
+                if ($(this).hasClass('available')) {
+                    $(this).removeClass('available').addClass('unavailable');
+                    $(this).text('Indisponible');
+                } else if ($(this).hasClass('unavailable')) {
+                    $(this).removeClass('unavailable').addClass('available');
+                    $(this).text('Disponible');
+                } else if ($(this).hasClass('busy')) {
+                    // If it's busy (has a jury assigned), we don't change it
+                    alert('Cette cellule a déjà un jury assigné. Veuillez d\'abord supprimer l\'assignation du jury.');
+                }
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeToggleChat = document.getElementById('themeToggleChat');
+            const body = document.body;
+            
+            function toggleTheme() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                
+                themeToggle.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                    
+                themeToggleChat.innerHTML = isDark
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+                
+                localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            }
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            themeToggleChat.addEventListener('click', toggleTheme);
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-theme', savedTheme);
+            
+            themeToggle.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+                
+            themeToggleChat.innerHTML = savedTheme === 'dark'
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+        });
+    </script>
+</body>
+</html>

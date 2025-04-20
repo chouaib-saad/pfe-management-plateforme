@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - Chef de Département</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <style>
+        /* Dashboard specific styles */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-message h1 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-message p {
+            color: var(--text-secondary);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calendar-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .calendar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: var(--font-weight-medium);
+            padding: 0.5rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .calendar-day.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .calendar-day.has-events::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: var(--radius-full);
+            background-color: var(--accent-color);
+            margin-top: 4px;
+        }
+        
+        .calendar-day.other-month {
+            color: var(--text-tertiary);
+        }
+        
+        .session-schedule {
+            margin-top: 2rem;
+        }
+        
+        .session-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .session-table th, .session-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .session-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .session-table td {
+            vertical-align: middle;
+        }
+        
+        .session-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .upcoming-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .upcoming-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upcoming-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .upcoming-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .upcoming-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-secondary);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .upcoming-item:hover {
+            transform: translateX(5px);
+            background-color: var(--bg-tertiary);
+        }
+        
+        .upcoming-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .upcoming-content {
+            flex: 1;
+        }
+        
+        .upcoming-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .upcoming-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        .upcoming-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .recent-activity {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .activity-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Session schedule styles */
+        .session-schedule {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        .session-table {
+            min-width: 600px;
+        }
+        
+        .session-cell {
+            position: relative;
+            height: 80px;
+            background-color: var(--bg-secondary);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .session-cell:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .session-cell.assigned {
+            background-color: rgba(var(--primary-blue-rgb), 0.1);
+        }
+        
+        .session-cell.assigned:hover {
+            background-color: rgba(var(--primary-blue-rgb), 0.2);
+        }
+        
+        .session-info {
+            font-size: var(--font-size-sm);
+            line-height: 1.3;
+        }
+        
+        .session-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .session-presenter, .session-supervisor {
+            color: var(--text-secondary);
+        }
+        
+        /* Add PFE modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Session times */
+        :root {
+            --primary-blue-rgb: 0, 102, 204;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link active">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="jury-management.html" class="sidebar-link">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des Jurys</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="calendar.html" class="sidebar-link">
+                    <i class="fas fa-calendar-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Calendrier</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="excel-import.html" class="sidebar-link">
+                    <i class="fas fa-file-excel sidebar-icon"></i>
+                    <span class="sidebar-text">Import Excel</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="statistics.html" class="sidebar-link">
+                    <i class="fas fa-chart-bar sidebar-icon"></i>
+                    <span class="sidebar-text">Statistiques</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <div class="welcome-message">
+                    <h1 class="fade-in">Bonjour, Chef de Département</h1>
+                    <p class="fade-in stagger-1">Bienvenue sur votre tableau de bord</p>
+                </div>
+                
+                <div class="user-actions">
+                    <button class="btn btn-primary" id="addPfeBtn">
+                        <i class="fas fa-plus mr-2"></i>Ajouter un PFE
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download mr-2"></i>Exporter
+                    </button>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card fade-in-up">
+                    <div class="stat-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-value">128</div>
+                    <div class="stat-label">Total PFEs</div>
+                </div>
+                
+                <div class="stat-card fade-in-up stagger-1">
+                    <div class="stat-icon" style="background-color: rgba(52, 199, 89, 0.1); color: var(--success-color);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">87</div>
+                    <div class="stat-label">Jurys Assignés</div>
+                </div>
+                
+                <div class="stat-card fade-in-up stagger-2">
+                    <div class="stat-icon" style="background-color: rgba(255, 149, 0, 0.1); color: var(--accent-color);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Présentations à venir</div>
+                </div>
+                
+                <div class="stat-card fade-in-up stagger-3">
+                    <div class="stat-icon" style="background-color: rgba(90, 200, 250, 0.1); color: var(--info-color);">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">Enseignants</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="calendar-container fade-in-up">
+                    <div class="calendar-header">
+                        <h2 class="calendar-title">Calendrier des Présentations</h2>
+                        <div class="calendar-actions">
+                            <button class="btn btn-sm btn-outline" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="calendar">
+                        <div class="calendar-grid" id="calendarDays">
+                            <div class="calendar-day-header">Lun</div>
+                            <div class="calendar-day-header">Mar</div>
+                            <div class="calendar-day-header">Mer</div>
+                            <div class="calendar-day-header">Jeu</div>
+                            <div class="calendar-day-header">Ven</div>
+                            <div class="calendar-day-header">Sam</div>
+                            <div class="calendar-day-header">Dim</div>
+                            
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="session-schedule">
+                        <h3 class="mb-3">Sessions du <span id="selectedDate">19 Avril 2025</span></h3>
+                        <table class="session-table">
+                            <thead>
+                                <tr>
+                                    <th>Session</th>
+                                    <th>Horaire</th>
+                                    <th>Salle</th>
+                                    <th>PFE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>S1</td>
+                                    <td class="session-time">08H30 - 10H00</td>
+                                    <td>A104</td>
+                                    <td class="session-cell assigned">
+                                        <div class="session-info">
+                                            <div class="session-title">Développement d'une application mobile</div>
+                                            <div class="session-presenter">Ahmed Benali</div>
+                                            <div class="session-supervisor">Dr. Mohamed Karim</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>S2</td>
+                                    <td class="session-time">10H10 - 11H40</td>
+                                    <td>A104</td>
+                                    <td class="session-cell assigned">
+                                        <div class="session-info">
+                                            <div class="session-title">Système embarqué pour la domotique</div>
+                                            <div class="session-presenter">Fatima Zahra</div>
+                                            <div class="session-supervisor">Dr. Nadia Alaoui</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>S3</td>
+                                    <td class="session-time">11H50 - 13H20</td>
+                                    <td>A104</td>
+                                    <td class="session-cell"></td>
+                                </tr>
+                                <tr>
+                                    <td>S4</td>
+                                    <td class="session-time">13H50 - 15H20</td>
+                                    <td>A104</td>
+                                    <td class="session-cell assigned">
+                                        <div class="session-info">
+                                            <div class="session-title">Intelligence artificielle pour la reconnaissance d'images</div>
+                                            <div class="session-presenter">Youssef Amrani</div>
+                                            <div class="session-supervisor">Dr. Kamal Hassan</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>S5</td>
+                                    <td class="session-time">15H30 - 17H00</td>
+                                    <td>A104</td>
+                                    <td class="session-cell"></td>
+                                </tr>
+                                <tr>
+                                    <td>S6</td>
+                                    <td class="session-time">17H10 - 18H40</td>
+                                    <td>A104</td>
+                                    <td class="session-cell"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="upcoming-container fade-in-up stagger-1">
+                    <div class="upcoming-header">
+                        <h2 class="upcoming-title">Présentations à venir</h2>
+                        <a href="calendar.html" class="btn btn-sm btn-outline">Voir tout</a>
+                    </div>
+                    
+                    <div class="upcoming-list">
+                        <div class="upcoming-item">
+                            <div class="upcoming-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="upcoming-content">
+                                <div class="upcoming-title">Développement d'une application mobile</div>
+                                <div class="upcoming-meta">
+                                    <span><i class="fas fa-user mr-1"></i>Ahmed Benali</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>19 Avr, 08:30</span>
+                                </div>
+                            </div>
+                            <div class="upcoming-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="upcoming-item">
+                            <div class="upcoming-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="upcoming-content">
+                                <div class="upcoming-title">Système embarqué pour la domotique</div>
+                                <div class="upcoming-meta">
+                                    <span><i class="fas fa-user mr-1"></i>Fatima Zahra</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>19 Avr, 10:10</span>
+                                </div>
+                            </div>
+                            <div class="upcoming-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="upcoming-item">
+                            <div class="upcoming-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="upcoming-content">
+                                <div class="upcoming-title">Intelligence artificielle pour la reconnaissance d'images</div>
+                                <div class="upcoming-meta">
+                                    <span><i class="fas fa-user mr-1"></i>Youssef Amrani</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>19 Avr, 13:50</span>
+                                </div>
+                            </div>
+                            <div class="upcoming-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="upcoming-item">
+                            <div class="upcoming-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="upcoming-content">
+                                <div class="upcoming-title">Système de gestion de base de données distribuée</div>
+                                <div class="upcoming-meta">
+                                    <span><i class="fas fa-user mr-1"></i>Salma Bennani</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>20 Avr, 08:30</span>
+                                </div>
+                            </div>
+                            <div class="upcoming-actions">
+                                <button class="btn-icon-only btn-sm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recent-activity fade-in-up">
+                <div class="activity-header">
+                    <h2 class="activity-title">Activités Récentes</h2>
+                    <a href="#" class="btn btn-sm btn-outline">Voir tout</a>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(52, 199, 89, 0.1); color: var(--success-color);">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Nouveau PFE ajouté: <strong>Système de gestion de base de données distribuée</strong></div>
+                            <div class="activity-time">Il y a 2 heures</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Jury assigné pour le PFE: <strong>Développement d'une application mobile</strong></div>
+                            <div class="activity-time">Il y a 5 heures</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(255, 149, 0, 0.1); color: var(--accent-color);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Présentation planifiée: <strong>Intelligence artificielle pour la reconnaissance d'images</strong></div>
+                            <div class="activity-time">Il y a 1 jour</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background-color: rgba(90, 200, 250, 0.1); color: var(--info-color);">
+                            <i class="fas fa-file-import"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Importation Excel réussie: <strong>15 nouveaux PFEs ajoutés</strong></div>
+                            <div class="activity-time">Il y a 2 jours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add PFE Modal -->
+    <div class="modal-backdrop" id="addPfeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter un nouveau PFE</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addPfeForm">
+                    <div class="form-group">
+                        <label for="pfeTitle" class="form-label">Titre du PFE</label>
+                        <input type="text" id="pfeTitle" class="form-control" placeholder="Titre du projet" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pfeStudent" class="form-label">Étudiant</label>
+                        <input type="text" id="pfeStudent" class="form-control" placeholder="Nom de l'étudiant" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pfeSupervisor" class="form-label">Encadreur</label>
+                        <select id="pfeSupervisor" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un encadreur</option>
+                            <option value="1">Dr. Mohamed Karim</option>
+                            <option value="2">Dr. Nadia Alaoui</option>
+                            <option value="3">Dr. Kamal Hassan</option>
+                            <option value="4">Dr. Omar Tazi</option>
+                            <option value="5">Dr. Hassan Bennani</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pfeDepartment" class="form-label">Département</label>
+                        <select id="pfeDepartment" class="form-select" required>
+                            <option value="" disabled selected>Sélectionner un département</option>
+                            <option value="1">Informatique</option>
+                            <option value="2">Électronique</option>
+                            <option value="3">Mécanique</option>
+                            <option value="4">Mathématique</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pfeDescription" class="form-label">Description</label>
+                        <textarea id="pfeDescription" class="form-control" rows="3" placeholder="Description du projet"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-2 gap-4">
+                        <div class="form-group">
+                            <label for="pfeStartDate" class="form-label">Date de début</label>
+                            <input type="date" id="pfeStartDate" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pfeEndDate" class="form-label">Date de fin</label>
+                            <input type="date" id="pfeEndDate" class="form-control" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAddPfe">Annuler</button>
+                <button class="btn btn-primary" id="submitAddPfe">Ajouter</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const dashboardContent = document.querySelector('.dashboard-content');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                dashboardContent.classList.toggle('sidebar-collapsed');
+            });
+        }
+        
+        // Modal Controls
+        const addPfeBtn = document.getElementById('addPfeBtn');
+        const addPfeModal = document.getElementById('addPfeModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAddPfe = document.getElementById('cancelAddPfe');
+        const submitAddPfe = document.getElementById('submitAddPfe');
+        
+        if (addPfeBtn && addPfeModal) {
+            addPfeBtn.addEventListener('click', () => {
+                addPfeModal.classList.add('active');
+            });
+            
+            closeModal.addEventListener('click', () => {
+                addPfeModal.classList.remove('active');
+            });
+            
+            cancelAddPfe.addEventListener('click', () => {
+                addPfeModal.classList.remove('active');
+            });
+            
+            submitAddPfe.addEventListener('click', () => {
+                // In a real application, this would submit the form data
+                alert('PFE ajouté avec succès!');
+                addPfeModal.classList.remove('active');
+            });
+        }
+        
+        // Simple Calendar Implementation
+        const calendarDays = document.getElementById('calendarDays');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        function generateCalendar(month, year) {
+            // Clear previous calendar days
+            while (calendarDays.children.length > 7) {
+                calendarDays.removeChild(calendarDays.lastChild);
+            }
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // Get the day of the week for the first day (0 = Sunday, 1 = Monday, etc.)
+            let firstDayOfWeek = firstDay.getDay();
+            if (firstDayOfWeek === 0) firstDayOfWeek = 7; // Adjust for Monday as first day
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 1; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day other-month';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Add cells for each day of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'calendar-day';
+                dayCell.textContent = i;
+                
+                // Mark current day
+                const currentDate = new Date();
+                if (i === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                    dayCell.classList.add('active');
+                }
+                
+                // Add event indicator for some days (just for demo)
+                if ([3, 7, 12, 19, 25].includes(i)) {
+                    dayCell.classList.add('has-events');
+                }
+                
+                dayCell.addEventListener('click', () => {
+                    // Remove active class from all days
+                    document.querySelectorAll('.calendar-day').forEach(day => {
+                        day.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked day
+                    dayCell.classList.add('active');
+                    
+                    // Update selected date display
+                    const selectedDate = new Date(year, month, i);
+                    document.getElementById('selectedDate').textContent = selectedDate.toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                });
+                
+                calendarDays.appendChild(dayCell);
+            }
+        }
+        
+        // Initialize calendar
+        generateCalendar(currentMonth, currentYear);
+        
+        // Previous month button
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+        });
+        
+        // Next month button
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+        });
+        
+        // Session cell click handler
+        document.querySelectorAll('.session-cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (!cell.classList.contains('assigned')) {
+                    addPfeModal.classList.add('active');
+                } else {
+                    alert('Cette session est déjà assignée. Voulez-vous modifier les détails?');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

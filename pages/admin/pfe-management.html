@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des PFE - Admin Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/card-menu.css">
+    <link rel="stylesheet" href="../../css/notification.css">
+    <link rel="stylesheet" href="../../css/ai-chatbot.css">
+    
+    <style>
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #0a0c2c 0%, #1a1f4b 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1a1f4b;
+            margin-right: 1rem;
+        }
+        
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-collapsed .sidebar-title {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-menu-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu-link:hover, .sidebar-menu-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar-menu-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-menu-text {
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-collapsed .sidebar-menu-text {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .sidebar-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .sidebar-user-info {
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-collapsed .sidebar-user-info {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .sidebar-user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-user-role {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .sidebar-toggle {
+            position: absolute;
+            top: 1rem;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1f4b;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content-expanded {
+            margin-left: 80px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1f4b;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .dashboard-search {
+            position: relative;
+        }
+        
+        .dashboard-search-input {
+            padding: 0.6rem 1rem;
+            padding-left: 2.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-search-input:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .dashboard-search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .dashboard-notification {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .dashboard-notification:hover {
+            background: #e9ecef;
+            color: #1a1f4b;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dashboard-user {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .dashboard-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.8rem;
+        }
+        
+        .dashboard-user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a1f4b;
+        }
+        
+        /* PFE Management Styles */
+        .pfe-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .pfe-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1f4b;
+        }
+        
+        .pfe-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .pfe-filter {
+            position: relative;
+        }
+        
+        .pfe-filter-select {
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: white;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .pfe-filter-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+        
+        .pfe-add-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pfe-add-btn:hover {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+        }
+        
+        .pfe-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.blue {
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+        
+        .stat-icon.green {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+        
+        .stat-icon.yellow {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        
+        .stat-icon.red {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1f4b;
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .pfe-table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .pfe-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .pfe-table th {
+            padding: 1.2rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: #1a1f4b;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .pfe-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            color: #6c757d;
+        }
+        
+        .pfe-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .pfe-table tr:hover td {
+            background: #f8f9fa;
+        }
+        
+        .pfe-title-cell {
+            color: #1a1f4b;
+            font-weight: 500;
+        }
+        
+        .pfe-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        
+        .status-active {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+        
+        .status-completed {
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+        
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .pfe-actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pfe-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pfe-action-btn:hover {
+            background: #e9ecef;
+            color: #1a1f4b;
+        }
+        
+        .pfe-action-btn.edit:hover {
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+        
+        .pfe-action-btn.delete:hover {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .pfe-action-btn.view:hover {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+        
+        .pfe-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover {
+            background: #f8f9fa;
+            color: #1a1f4b;
+        }
+        
+        .pagination-btn.active {
+            background: #a5b4fc;
+            color: white;
+            border-color: #a5b4fc;
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Departments Section */
+        .departments-section {
+            margin-top: 3rem;
+        }
+        
+        .departments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .departments-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1f4b;
+        }
+        
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .department-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .department-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .department-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1f4b;
+        }
+        
+        .department-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .department-icon.info {
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+        
+        .department-icon.telecom {
+            background: rgba(111, 66, 193, 0.1);
+            color: #6f42c1;
+        }
+        
+        .department-icon.meca {
+            background: rgba(253, 126, 20, 0.1);
+            color: #fd7e14;
+        }
+        
+        .department-icon.elec {
+            background: rgba(32, 201, 151, 0.1);
+            color: #20c997;
+        }
+        
+        .department-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .department-stat {
+            flex: 1;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .department-stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1f4b;
+            margin-bottom: 0.2rem;
+        }
+        
+        .department-stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .department-progress {
+            margin-bottom: 1rem;
+        }
+        
+        .progress-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .progress-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a1f4b;
+        }
+        
+        .progress-bar-container {
+            height: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .progress-bar-fill.info {
+            background: #0d6efd;
+        }
+        
+        .progress-bar-fill.telecom {
+            background: #6f42c1;
+        }
+        
+        .progress-bar-fill.meca {
+            background: #fd7e14;
+        }
+        
+        .progress-bar-fill.elec {
+            background: #20c997;
+        }
+        
+        .department-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .department-action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #f8f9fa;
+            color: #6c757d;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .department-action-btn:hover {
+            background: #e9ecef;
+            color: #1a1f4b;
+        }
+        
+        /* PFE Modal */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1f4b;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #1a1f4b;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .form-select {
+            padding: 0.8rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+        
+        .form-select:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: #1a1f4b;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar-title, .sidebar-menu-text, .sidebar-user-info {
+                opacity: 0;
+                width: 0;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .dashboard-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .dashboard-search-input {
+                width: 100%;
+            }
+            
+            .pfe-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .pfe-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .pfe-table-container {
+                overflow-x: auto;
+            }
+            
+            .pfe-table {
+                min-width: 800px;
+            }
+            
+            .departments-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="sidebar-brand">
+                <img src="https://www.issatso.rnu.tn/wp-content/uploads/2021/01/issat-so-logo.png" alt="ISSAT Logo">
+                <span>PFE Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link active">
+                    <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Tableau de bord</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="users.html" class="sidebar-link">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    <span class="sidebar-text">Utilisateurs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="departments.html" class="sidebar-link">
+                    <i class="fas fa-building sidebar-icon"></i>
+                    <span class="sidebar-text">Départements</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="teachers.html" class="sidebar-link">
+                    <i class="fas fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Enseignants</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="pfe-management.html" class="sidebar-link">
+                    <i class="fas fa-tasks sidebar-icon"></i>
+                    <span class="sidebar-text">Gestion des PFEs</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog sidebar-icon"></i>
+                    <span class="sidebar-text">Paramètres</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="sidebar-text">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Gestion des PFE</h1>
+                
+                <div class="dashboard-actions">
+                    <div class="dashboard-search">
+                        <input type="text" class="dashboard-search-input" placeholder="Rechercher...">
+                        <div class="dashboard-search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-notification">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-badge">3</div>
+                    </div>
+                    
+                    <div class="dashboard-user">
+                        <div class="dashboard-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="dashboard-user-name">Admin</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PFE Stats -->
+            <div class="pfe-stats">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">152</div>
+                        <div class="stat-label">Total des PFE</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">87</div>
+                        <div class="stat-label">PFE Actifs</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">20</div>
+                        <div class="stat-label">Problèmes signalés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PFE Management -->
+            <div class="pfe-management">
+                <div class="pfe-header">
+                    <h2 class="pfe-title">Liste des Projets</h2>
+                    
+                    <div class="pfe-actions">
+                        <div class="pfe-filter">
+                            <select class="pfe-filter-select">
+                                <option value="all">Tous les départements</option>
+                                <option value="info">Informatique</option>
+                                <option value="telecom">Télécommunications</option>
+                                <option value="meca">Mécanique</option>
+                                <option value="elec">Électrique</option>
+                            </select>
+                            <div class="pfe-filter-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        
+                        <button class="pfe-add-btn" data-bs-toggle="modal" data-bs-target="#addPfeModal">
+                            <i class="fas fa-plus"></i>
+                            Ajouter un projet
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="pfe-table-container">
+                    <table class="pfe-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Titre du projet</th>
+                                <th>Étudiant</th>
+                                <th>Encadrant</th>
+                                <th>Département</th>
+                                <th>Date de soutenance</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PFE-2025-001</td>
+                                <td class="pfe-title-cell">Système de reconnaissance faciale pour la sécurité</td>
+                                <td>Ahmed Trabelsi</td>
+                                <td>Dr. Sonia Trabelsi</td>
+                                <td>Informatique</td>
+                                <td>15/06/2025</td>
+                                <td><span class="pfe-status status-active">Actif</span></td>
+                                <td>
+                                    <div class="pfe-actions-cell">
+                                        <button class="pfe-action-btn view" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="pfe-action-btn edit" title="Modifier" data-bs-toggle="modal" data-bs-target="#editPfeModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="pfe-action-btn delete" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PFE-2025-002</td>
+                                <td class="pfe-title-cell">Plateforme de gestion des ressources humaines</td>
+                                <td>Leila Ben Salah</td>
+                                <td>Dr. Mohamed Karim</td>
+                                <td>Informatique</td>
+                                <td>18/06/2025</td>
+                                <td><span class="pfe-status status-active">Actif</span></td>
+                                <td>
+                                    <div class="pfe-actions-cell">
+                                        <button class="pfe-action-btn view" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="pfe-action-btn edit" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="pfe-action-btn delete" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PFE-2025-003</td>
+                                <td class="pfe-title-cell">Système IoT pour la surveillance environnementale</td>
+                                <td>Karim Mejri</td>
+                                <td>Dr. Nabil Tabbane</td>
+                                <td>Télécommunications</td>
+                                <td>20/06/2025</td>
+                                <td><span class="pfe-status status-pending">En attente</span></td>
+                                <td>
+                                    <div class="pfe-actions-cell">
+                                        <button class="pfe-action-btn view" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="pfe-action-btn edit" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="pfe-action-btn delete" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PFE-2025-004</td>
+                                <td class="pfe-title-cell">Application mobile de suivi médical</td>
+                                <td>Sarra Bouazizi</td>
+                                <td>Dr. Ahmed Ben Ali</td>
+                                <td>Informatique</td>
+                                <td>22/06/2025</td>
+                                <td><span class="pfe-status status-active">Actif</span></td>
+                                <td>
+                                    <div class="pfe-actions-cell">
+                                        <button class="pfe-action-btn view" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="pfe-action-btn edit" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="pfe-action-btn delete" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PFE-2025-005</td>
+                                <td class="pfe-title-cell">Système de contrôle automatisé pour usine</td>
+                                <td>Yassine Khelifi</td>
+                                <td>Dr. Leila Mansour</td>
+                                <td>Électrique</td>
+                                <td>25/06/2025</td>
+                                <td><span class="pfe-status status-completed">Terminé</span></td>
+                                <td>
+                                    <div class="pfe-actions-cell">
+                                        <button class="pfe-action-btn view" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="pfe-action-btn edit" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="pfe-action-btn delete" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pfe-pagination">
+                    <div class="pagination-info">
+                        Affichage de 1 à 5 sur 152 projets
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <button class="pagination-btn disabled">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Departments Section -->
+            <div class="departments-section">
+                <div class="departments-header">
+                    <h2 class="departments-title">Aperçu par département</h2>
+                </div>
+                
+                <div class="departments-grid">
+                    <div class="department-card">
+                        <div class="department-header">
+                            <div class="department-name">Informatique</div>
+                            <div class="department-icon info">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="department-stats">
+                            <div class="department-stat">
+                                <div class="department-stat-value">68</div>
+                                <div class="department-stat-label">Projets</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">15</div>
+                                <div class="department-stat-label">Encadrants</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">12</div>
+                                <div class="department-stat-label">Soutenances</div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-progress">
+                            <div class="progress-label">
+                                <div class="progress-title">Progression</div>
+                                <div class="progress-value">75%</div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill info" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-actions">
+                            <button class="department-action-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    
+                    <div class="department-card">
+                        <div class="department-header">
+                            <div class="department-name">Télécommunications</div>
+                            <div class="department-icon telecom">
+                                <i class="fas fa-broadcast-tower"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="department-stats">
+                            <div class="department-stat">
+                                <div class="department-stat-value">42</div>
+                                <div class="department-stat-label">Projets</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">10</div>
+                                <div class="department-stat-label">Encadrants</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">8</div>
+                                <div class="department-stat-label">Soutenances</div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-progress">
+                            <div class="progress-label">
+                                <div class="progress-title">Progression</div>
+                                <div class="progress-value">60%</div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill telecom" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-actions">
+                            <button class="department-action-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    
+                    <div class="department-card">
+                        <div class="department-header">
+                            <div class="department-name">Mécanique</div>
+                            <div class="department-icon meca">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="department-stats">
+                            <div class="department-stat">
+                                <div class="department-stat-value">25</div>
+                                <div class="department-stat-label">Projets</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">8</div>
+                                <div class="department-stat-label">Encadrants</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">5</div>
+                                <div class="department-stat-label">Soutenances</div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-progress">
+                            <div class="progress-label">
+                                <div class="progress-title">Progression</div>
+                                <div class="progress-value">45%</div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill meca" style="width: 45%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-actions">
+                            <button class="department-action-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    
+                    <div class="department-card">
+                        <div class="department-header">
+                            <div class="department-name">Électrique</div>
+                            <div class="department-icon elec">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="department-stats">
+                            <div class="department-stat">
+                                <div class="department-stat-value">17</div>
+                                <div class="department-stat-label">Projets</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">6</div>
+                                <div class="department-stat-label">Encadrants</div>
+                            </div>
+                            <div class="department-stat">
+                                <div class="department-stat-value">3</div>
+                                <div class="department-stat-label">Soutenances</div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-progress">
+                            <div class="progress-label">
+                                <div class="progress-title">Progression</div>
+                                <div class="progress-value">30%</div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill elec" style="width: 30%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="department-actions">
+                            <button class="department-action-btn">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add PFE Modal -->
+    <div class="modal fade" id="addPfeModal" tabindex="-1" aria-labelledby="addPfeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPfeModalLabel">Ajouter un projet PFE</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeTitle" class="form-label">Titre du projet</label>
+                                    <input type="text" class="form-control" id="pfeTitle" placeholder="Entrez le titre du projet">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeDepartment" class="form-label">Département</label>
+                                    <select class="form-select" id="pfeDepartment">
+                                        <option value="">Sélectionnez un département</option>
+                                        <option value="info">Informatique</option>
+                                        <option value="telecom">Télécommunications</option>
+                                        <option value="meca">Mécanique</option>
+                                        <option value="elec">Électrique</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeStudent" class="form-label">Étudiant</label>
+                                    <input type="text" class="form-control" id="pfeStudent" placeholder="Nom de l'étudiant">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeStudentEmail" class="form-label">Email de l'étudiant</label>
+                                    <input type="email" class="form-control" id="pfeStudentEmail" placeholder="Email de l'étudiant">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeSupervisor" class="form-label">Encadrant</label>
+                                    <select class="form-select" id="pfeSupervisor">
+                                        <option value="">Sélectionnez un encadrant</option>
+                                        <option value="1">Dr. Ahmed Ben Ali</option>
+                                        <option value="2">Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4">Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeDate" class="form-label">Date de soutenance</label>
+                                    <input type="date" class="form-control" id="pfeDate">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeSession" class="form-label">Session</label>
+                                    <select class="form-select" id="pfeSession">
+                                        <option value="">Sélectionnez une session</option>
+                                        <option value="S1">S1 (08H30 - 10H00)</option>
+                                        <option value="S2">S2 (10H10 - 11H40)</option>
+                                        <option value="S3">S3 (11H50 - 13H20)</option>
+                                        <option value="S4">S4 (13H50 - 15H20)</option>
+                                        <option value="S5">S5 (15H30 - 17H00)</option>
+                                        <option value="S6">S6 (17H10 - 18H40)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeRoom" class="form-label">Salle</label>
+                                    <input type="text" class="form-control" id="pfeRoom" placeholder="Numéro de salle">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pfeDescription" class="form-label">Description du projet</label>
+                            <textarea class="form-control" id="pfeDescription" rows="4" placeholder="Description détaillée du projet"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeJuryPresident" class="form-label">Président du jury</label>
+                                    <select class="form-select" id="pfeJuryPresident">
+                                        <option value="">Sélectionnez un président</option>
+                                        <option value="1">Dr. Ahmed Ben Ali</option>
+                                        <option value="2">Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4">Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="pfeJuryMember" class="form-label">Rapporteur</label>
+                                    <select class="form-select" id="pfeJuryMember">
+                                        <option value="">Sélectionnez un rapporteur</option>
+                                        <option value="1">Dr. Ahmed Ben Ali</option>
+                                        <option value="2">Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4">Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pfeStatus" class="form-label">Statut</label>
+                            <select class="form-select" id="pfeStatus">
+                                <option value="pending">En attente</option>
+                                <option value="active" selected>Actif</option>
+                                <option value="completed">Terminé</option>
+                                <option value="cancelled">Annulé</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit PFE Modal -->
+    <div class="modal fade" id="editPfeModal" tabindex="-1" aria-labelledby="editPfeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPfeModalLabel">Modifier le projet PFE</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeTitle" class="form-label">Titre du projet</label>
+                                    <input type="text" class="form-control" id="editPfeTitle" value="Système de reconnaissance faciale pour la sécurité">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeDepartment" class="form-label">Département</label>
+                                    <select class="form-select" id="editPfeDepartment">
+                                        <option value="">Sélectionnez un département</option>
+                                        <option value="info" selected>Informatique</option>
+                                        <option value="telecom">Télécommunications</option>
+                                        <option value="meca">Mécanique</option>
+                                        <option value="elec">Électrique</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeStudent" class="form-label">Étudiant</label>
+                                    <input type="text" class="form-control" id="editPfeStudent" value="Ahmed Trabelsi">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeStudentEmail" class="form-label">Email de l'étudiant</label>
+                                    <input type="email" class="form-control" id="editPfeStudentEmail" value="ahmed.trabelsi@example.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeSupervisor" class="form-label">Encadrant</label>
+                                    <select class="form-select" id="editPfeSupervisor">
+                                        <option value="">Sélectionnez un encadrant</option>
+                                        <option value="1">Dr. Ahmed Ben Ali</option>
+                                        <option value="2" selected>Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4">Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeDate" class="form-label">Date de soutenance</label>
+                                    <input type="date" class="form-control" id="editPfeDate" value="2025-06-15">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeSession" class="form-label">Session</label>
+                                    <select class="form-select" id="editPfeSession">
+                                        <option value="">Sélectionnez une session</option>
+                                        <option value="S1">S1 (08H30 - 10H00)</option>
+                                        <option value="S2" selected>S2 (10H10 - 11H40)</option>
+                                        <option value="S3">S3 (11H50 - 13H20)</option>
+                                        <option value="S4">S4 (13H50 - 15H20)</option>
+                                        <option value="S5">S5 (15H30 - 17H00)</option>
+                                        <option value="S6">S6 (17H10 - 18H40)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeRoom" class="form-label">Salle</label>
+                                    <input type="text" class="form-control" id="editPfeRoom" value="A105">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editPfeDescription" class="form-label">Description du projet</label>
+                            <textarea class="form-control" id="editPfeDescription" rows="4">Ce projet vise à développer un système de reconnaissance faciale pour améliorer la sécurité des bâtiments. Il utilise des algorithmes d'intelligence artificielle pour identifier les personnes et contrôler l'accès aux zones sécurisées.</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeJuryPresident" class="form-label">Président du jury</label>
+                                    <select class="form-select" id="editPfeJuryPresident">
+                                        <option value="">Sélectionnez un président</option>
+                                        <option value="1" selected>Dr. Ahmed Ben Ali</option>
+                                        <option value="2">Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4">Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPfeJuryMember" class="form-label">Rapporteur</label>
+                                    <select class="form-select" id="editPfeJuryMember">
+                                        <option value="">Sélectionnez un rapporteur</option>
+                                        <option value="1">Dr. Ahmed Ben Ali</option>
+                                        <option value="2">Dr. Sonia Trabelsi</option>
+                                        <option value="3">Dr. Mohamed Karim</option>
+                                        <option value="4" selected>Dr. Leila Mansour</option>
+                                        <option value="5">Dr. Nabil Tabbane</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editPfeStatus" class="form-label">Statut</label>
+                            <select class="form-select" id="editPfeStatus">
+                                <option value="pending">En attente</option>
+                                <option value="active" selected>Actif</option>
+                                <option value="completed">Terminé</option>
+                                <option value="cancelled">Annulé</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-toggle">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-title">Assistant PFE</div>
+                <div class="chatbot-controls">
+                    <div class="chatbot-minimize"><i class="fas fa-minus"></i></div>
+                    <div class="chatbot-close"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Bonjour ! Je suis l'assistant IA de la plateforme PFE. Comment puis-je vous aider aujourd'hui ?</p>
+                    </div>
+                    <div class="message-time">Maintenant</div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions">
+                <div class="suggestion-chip">Comment ajouter un projet ?</div>
+                <div class="suggestion-chip">Gérer les jurys</div>
+                <div class="suggestion-chip">Statistiques par département</div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Tapez votre message...">
+                <div class="chatbot-actions">
+                    <div class="action-button voice-input"><i class="fas fa-microphone"></i></div>
+                    <div class="action-button send-message"><i class="fas fa-paper-plane"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/ui-components.js"></script>
+    <script src="../../js/ai-chatbot.js"></script>
+    
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            // Change toggle icon
+            const toggleIcon = this.querySelector('i');
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            } else {
+                toggleIcon.classList.remove('fa-chevron-right');
+                toggleIcon.classList.add('fa-chevron-left');
+            }
+        });
+        
+        // Notifications
+        document.querySelector('.dashboard-notification').addEventListener('click', function() {
+            // Show notification dropdown (would be implemented with a proper dropdown)
+            console.log('Notifications clicked');
+        });
+        
+        // PFE Actions
+        document.querySelectorAll('.pfe-action-btn.view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // View PFE details (would open a modal or navigate to details page)
+                console.log('View PFE clicked');
+            });
+        });
+        
+        document.querySelectorAll('.pfe-action-btn.delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+                    // Delete PFE (would call an API in a real application)
+                    console.log('Delete PFE confirmed');
+                }
+            });
+        });
+        
+        // Pagination
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+            if (!btn.classList.contains('disabled')) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.pagination-btn').forEach(b => b.classList.remove('active'));
+                    if (!this.querySelector('i')) {
+                        this.classList.add('active');
+                    }
+                    // Would load the corresponding page in a real application
+                    console.log('Pagination clicked');
+                });
+            }
+        });
+        
+        // Department Actions
+        document.querySelectorAll('.department-action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // View department details (would navigate to department details page)
+                console.log('Department details clicked');
+            });
+        });
+    </script>
+</body>
+</html>
